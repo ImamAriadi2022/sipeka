@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import AdminHeader from '../components/halamanriwayatadmin/AdminHeader';
-import AdminSidebar from '../components/halamanriwayatadmin/AdminSidebar';
-import ExportButton from '../components/halamanriwayatadmin/ExportButton';
-import HistoryFilters from '../components/halamanriwayatadmin/HistoryFilters';
-import HistoryStats from '../components/halamanriwayatadmin/HistoryStats';
-import HistoryTable from '../components/halamanriwayatadmin/HistoryTable';
+import AdminHeader from '../../components/admin/riwayatadmin/AdminHeader';
+import AdminSidebar from '../../components/admin/riwayatadmin/AdminSidebar';
+import ExportButton from '../../components/admin/riwayatadmin/ExportButton';
+import HistoryFilters from '../../components/admin/riwayatadmin/HistoryFilters';
+import HistoryStats from '../../components/admin/riwayatadmin/HistoryStats';
+import HistoryTable from '../../components/admin/riwayatadmin/HistoryTable';
 
 const HalamanRiwayatAdmin = () => {
   const [history, setHistory] = useState([]);

@@ -40,3 +40,20 @@ export { default as ValidasiForm } from './admin/validasipimpinan/ValidasiForm';
 export { default as ValidasiStats } from './admin/validasipimpinan/ValidasiStats';
 export { default as ValidasiTable } from './admin/validasipimpinan/ValidasiTable';
 
+// Admin Riwayat components
+export { default as RiwayatAdminHeader } from './admin/riwayatadmin/AdminHeader';
+export { default as RiwayatAdminSidebar } from './admin/riwayatadmin/AdminSidebar';
+export { default as ExportButton } from './admin/riwayatadmin/ExportButton';
+export { default as HistoryFilters } from './admin/riwayatadmin/HistoryFilters';
+export { default as HistoryStats } from './admin/riwayatadmin/HistoryStats';
+export { default as HistoryTable } from './admin/riwayatadmin/HistoryTable';
+
+// Admin Detail Laporan components
+export { default as DetailLaporanAdminHeader } from './admin/detaillaporan/AdminHeader';
+export { default as DetailLaporanAdminSidebar } from './admin/detaillaporan/AdminSidebar';
+export { default as ReportActions } from './admin/detaillaporan/ReportActions';
+export { default as ReportComments } from './admin/detaillaporan/ReportComments';
+export { default as ReportDetailCard } from './admin/detaillaporan/ReportDetailCard';
+export { default as ReportLocation } from './admin/detaillaporan/ReportLocation';
+export { default as ReportPhotos } from './admin/detaillaporan/ReportPhotos';
+

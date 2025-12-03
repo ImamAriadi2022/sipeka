@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import AdminHeader from '../components/halamandetaillaporanadmin/AdminHeader';
-import AdminSidebar from '../components/halamandetaillaporanadmin/AdminSidebar';
-import ReportActions from '../components/halamandetaillaporanadmin/ReportActions';
-import ReportComments from '../components/halamandetaillaporanadmin/ReportComments';
-import ReportDetailCard from '../components/halamandetaillaporanadmin/ReportDetailCard';
-import ReportLocation from '../components/halamandetaillaporanadmin/ReportLocation';
-import ReportPhotos from '../components/halamandetaillaporanadmin/ReportPhotos';
+import AdminHeader from '../../components/admin/detaillaporan/AdminHeader';
+import AdminSidebar from '../../components/admin/detaillaporan/AdminSidebar';
+import ReportActions from '../../components/admin/detaillaporan/ReportActions';
+import ReportComments from '../../components/admin/detaillaporan/ReportComments';
+import ReportDetailCard from '../../components/admin/detaillaporan/ReportDetailCard';
+import ReportLocation from '../../components/admin/detaillaporan/ReportLocation';
+import ReportPhotos from '../../components/admin/detaillaporan/ReportPhotos';
 
 const HalamanDetailLaporanAdmin = () => {
   const { reportId } = useParams();
