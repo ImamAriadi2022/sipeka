@@ -145,6 +145,8 @@ const RegisterForm = ({ onSubmit, loading, onToggleMode }) => {
           </div>
         </Form.Group>
 
+        {/* Role is implicitly Mahasiswa (user); no manual selection */}
+
         {/* Sign Up Button */}
         <Button 
           type="submit" 
