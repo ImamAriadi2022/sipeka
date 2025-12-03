@@ -4,7 +4,7 @@ import './App.css';
 // Import all pages
 // Auth pages
 import Login from './pages/Login';
-import Sign from './pages/Sign';
+import Register from './pages/Register';
 
 // User pages
 import BuatLaporan from './pages/user/BuatLaporan';
@@ -72,8 +72,8 @@ const SimpleRouter = () => {
       case '/login':
         return isAuthenticated ? <Dashboard /> : <Login />;
       
-      case '/sign':
-        return <Sign />;
+      case '/register':
+        return <Register />;
       
       case '/dashboard':
         return (

@@ -1,5 +1,5 @@
 
-const LoginHeader = () => {
+const RegisterHeader = () => {
   return (
     <div className="text-center w-100">
       <div className="mb-4">
@@ -26,4 +26,4 @@ const LoginHeader = () => {
   );
 };
 
-export default LoginHeader;
+export default RegisterHeader;

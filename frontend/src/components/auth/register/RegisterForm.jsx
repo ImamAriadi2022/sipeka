@@ -2,9 +2,11 @@ import { useState } from 'react';
 import { Alert, Button, Form } from 'react-bootstrap';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
-const LoginForm = ({ onSubmit, loading, onToggleMode }) => {
+const RegisterForm = ({ onSubmit, loading, onToggleMode }) => {
   const [formData, setFormData] = useState({
+    fullName: '',
     email: '',
+    npm: '',
     password: ''
   });
   const [showPassword, setShowPassword] = useState(false);
@@ -23,8 +25,8 @@ const LoginForm = ({ onSubmit, loading, onToggleMode }) => {
     e.preventDefault();
     
     // Basic validation
-    if (!formData.email || !formData.password) {
-      setError('Harap lengkapi semua kolom');
+    if (!formData.fullName || !formData.email || !formData.npm || !formData.password) {
+      setError('Please fill all fields');
       return;
     }
     
@@ -36,13 +38,12 @@ const LoginForm = ({ onSubmit, loading, onToggleMode }) => {
            width: '300px',
            border: '2px solid #007bff',
            borderRadius: '15px',
-           padding: '20px',
+           padding: '15px',
            backgroundColor: '#ffffff'
          }}>
       {/* Header */}
-      <div className="text-center mb-3">
-        <h4 className="fw-bold text-dark mb-2">Hello! Welcome back.</h4>
-        <p className="text-muted mb-0">Login with the data you entered during Registration.</p>
+      <div className="text-center mb-2">
+        <h5 className="fw-bold text-dark mb-1" style={{ fontSize: '14px' }}>Please Fill this form to create an Account</h5>
       </div>
 
       {/* Error Alert */}
@@ -52,30 +53,68 @@ const LoginForm = ({ onSubmit, loading, onToggleMode }) => {
         </Alert>
       )}
 
-      {/* Login Form */}
+      {/* Register Form */}
       <Form onSubmit={handleSubmit}>
+        {/* Full Name Field */}
+        <Form.Group className="mb-1">
+          <Form.Label className="text-primary fw-semibold mb-0" style={{ fontSize: '12px' }}>Full Name <span className="text-danger">*</span></Form.Label>
+          <Form.Control
+            type="text"
+            name="fullName"
+            value={formData.fullName}
+            onChange={handleChange}
+            placeholder=""
+            className="py-1"
+            style={{ 
+              borderRadius: '6px',
+              border: '2px solid #ced4da',
+              fontSize: '13px'
+            }}
+            required
+          />
+        </Form.Group>
+
         {/* Email Field */}
-        <Form.Group className="mb-2">
-          <Form.Label className="text-primary fw-semibold">Email Address <span className="text-danger">*</span></Form.Label>
+        <Form.Group className="mb-1">
+          <Form.Label className="text-primary fw-semibold mb-0" style={{ fontSize: '12px' }}>Email Address <span className="text-danger">*</span></Form.Label>
           <Form.Control
             type="email"
             name="email"
             value={formData.email}
             onChange={handleChange}
-            placeholder="fatima001@gmail.com"
-            className="py-2"
+            placeholder=""
+            className="py-1"
             style={{ 
-              borderRadius: '8px',
+              borderRadius: '6px',
               border: '2px solid #ced4da',
-              fontSize: '14px'
+              fontSize: '13px'
+            }}
+            required
+          />
+        </Form.Group>
+
+        {/* NPM Field */}
+        <Form.Group className="mb-1">
+          <Form.Label className="text-primary fw-semibold mb-0" style={{ fontSize: '12px' }}>NPM <span className="text-danger">*</span></Form.Label>
+          <Form.Control
+            type="text"
+            name="npm"
+            value={formData.npm}
+            onChange={handleChange}
+            placeholder=""
+            className="py-1"
+            style={{ 
+              borderRadius: '6px',
+              border: '2px solid #ced4da',
+              fontSize: '13px'
             }}
             required
           />
         </Form.Group>
 
         {/* Password Field */}
-        <Form.Group className="mb-2">
-          <Form.Label className="text-primary fw-semibold">Password <span className="text-danger">*</span></Form.Label>
+        <Form.Group className="mb-1">
+          <Form.Label className="text-primary fw-semibold mb-0" style={{ fontSize: '12px' }}>Password <span className="text-danger">*</span></Form.Label>
           <div className="position-relative">
             <Form.Control
               type={showPassword ? 'text' : 'password'}
@@ -83,11 +122,11 @@ const LoginForm = ({ onSubmit, loading, onToggleMode }) => {
               value={formData.password}
               onChange={handleChange}
               placeholder="••••••••••••••••"
-              className="py-2 pe-5"
+              className="py-1 pe-5"
               style={{ 
-                borderRadius: '8px',
+                borderRadius: '6px',
                 border: '2px solid #ced4da',
-                fontSize: '14px'
+                fontSize: '13px'
               }}
               required
             />
@@ -106,57 +145,41 @@ const LoginForm = ({ onSubmit, loading, onToggleMode }) => {
           </div>
         </Form.Group>
 
-        {/* Forgot Password Link */}
-        <div className="text-end mb-2">
-          <Button 
-            variant="link" 
-            className="p-0 text-primary text-decoration-none fw-normal"
-            style={{ fontSize: '14px' }}
-            onClick={() => alert('Forgot Password feature coming soon')}
-          >
-            Forgot Password?
-          </Button>
-        </div>
-
-        {/* Login Button */}
+        {/* Sign Up Button */}
         <Button 
           type="submit" 
-          className="w-100 py-2 fw-bold text-white mb-2"
+          className="w-100 py-2 fw-bold text-white mb-1 mt-2"
           style={{ 
             backgroundColor: '#007bff',
-            borderRadius: '8px',
+            borderRadius: '6px',
             border: 'none',
-            fontSize: '16px'
+            fontSize: '14px'
           }}
           disabled={loading}
         >
           {loading ? (
             <>
               <span className="spinner-border spinner-border-sm me-2" role="status"></span>
-              Logging in...
+              Signing up...
             </>
           ) : (
-            'Login Now'
+            'Sign Up'
           )}
         </Button>
 
-        {/* Register Link */}
+        {/* Login Link */}
         <div className="text-center">
-          <span className="text-muted" style={{ fontSize: '14px' }}>Don't have an Account? </span>
+          <span className="text-muted" style={{ fontSize: '12px' }}>Already have an account? </span>
           <Button 
             variant="link" 
             className="p-0 text-primary text-decoration-none fw-bold"
-            style={{ fontSize: '14px' }}
+            style={{ fontSize: '12px' }}
             onClick={() => {
-              if (onToggleMode) {
-                onToggleMode();
-              } else {
-                window.history.pushState({}, '', '/register');
-                window.location.reload();
-              }
+              window.history.pushState({}, '', '/login');
+              window.location.reload();
             }}
           >
-            REGISTER
+            LOGIN
           </Button>
         </div>
       </Form>
@@ -164,4 +187,4 @@ const LoginForm = ({ onSubmit, loading, onToggleMode }) => {
   );
 };
 
-export default LoginForm;
+export default RegisterForm;
