@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Col, Container, Row } from 'react-bootstrap';
 import AdminHeader from '../../components/admin/riwayatadmin/AdminHeader';
 import AdminSidebar from '../../components/admin/riwayatadmin/AdminSidebar';
 import ExportButton from '../../components/admin/riwayatadmin/ExportButton';
@@ -7,43 +8,73 @@ import HistoryStats from '../../components/admin/riwayatadmin/HistoryStats';
 import HistoryTable from '../../components/admin/riwayatadmin/HistoryTable';
 
 const HalamanRiwayatAdmin = () => {
-  const [history, setHistory] = useState([]);
+  const [historyData, setHistoryData] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [filters, setFilters] = useState({
     dateRange: 'month',
-    action: 'all',
+    actionType: 'all',
     admin: 'all',
-    search: ''
+    status: 'all',
+    searchTerm: ''
   });
   const [stats, setStats] = useState({
-    totalActions: 0,
-    reportsProcessed: 0,
-    averageResponseTime: 0
+    totalActions: 125,
+    reportsProcessed: 42,
+    averageResponseTime: 2.5
   });
 
   useEffect(() => {
-    // TODO: Fetch admin activity history
-    const fetchHistory = async () => {
-      // Implement API call
-    };
-    fetchHistory();
+    // Mock data for demonstration
+    const mockData = [
+      {
+        id: 1,
+        timestamp: '2024-12-03T10:30:00Z',
+        actionType: 'create',
+        actionName: 'Membuat Laporan',
+        description: 'Admin membuat laporan kerusakan fasilitas',
+        target: 'RPT-001',
+        admin: 'Admin 1',
+        adminRole: 'Administrator',
+        status: 'success'
+      },
+      {
+        id: 2,
+        timestamp: '2024-12-03T09:15:00Z',
+        actionType: 'update',
+        actionName: 'Update Status',
+        description: 'Mengubah status laporan menjadi dalam proses',
+        target: 'RPT-002',
+        admin: 'Admin 2',
+        adminRole: 'Moderator',
+        status: 'success'
+      }
+    ];
+    
+    setHistoryData(mockData);
   }, [filters]);
 
-  const handleExport = async (format) => {
-    // TODO: Export history data
-    console.log('Exporting history in format:', format);
+  const handleFilterChange = (newFilters) => {
+    setFilters(newFilters);
+    // TODO: Fetch filtered data
   };
 
   return (
-    <div className="halaman-riwayat-admin-page">
+    <div className="d-flex">
       <AdminSidebar />
-      <div className="halaman-riwayat-admin-content">
+      <div className="flex-grow-1">
         <AdminHeader title="Riwayat Aktivitas Admin" />
-        <HistoryStats stats={stats} />
-        <div className="history-controls">
-          <HistoryFilters filters={filters} onFiltersChange={setFilters} />
-          <ExportButton onExport={handleExport} />
-        </div>
-        <HistoryTable history={history} />
+        <Container fluid className="py-4">
+          <HistoryStats stats={stats} />
+          <HistoryFilters filters={filters} onFilterChange={handleFilterChange} />
+          <Row>
+            <Col lg={8}>
+              <HistoryTable historyData={historyData} loading={loading} />
+            </Col>
+            <Col lg={4}>
+              <ExportButton historyData={historyData} filters={filters} />
+            </Col>
+          </Row>
+        </Container>
       </div>
     </div>
   );

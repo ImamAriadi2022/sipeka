@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Col, Container, Row, Spinner } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
 import AdminHeader from '../../components/admin/detaillaporan/AdminHeader';
 import AdminSidebar from '../../components/admin/detaillaporan/AdminSidebar';
@@ -18,12 +19,17 @@ const HalamanDetailLaporanAdmin = () => {
     const fetchReportDetail = async () => {
       setLoading(true);
       try {
-        // Implement API call
-        // const reportData = await api.getReportDetail(reportId);
-        // setReport(reportData);
+        // Mock data for demonstration
+        setTimeout(() => {
+          setReport({
+            id: reportId || 'RPT-001',
+            title: 'Kerusakan Fasilitas Umum di Taman Kota',
+            status: 'pending'
+          });
+          setLoading(false);
+        }, 1000);
       } catch (error) {
         console.error('Error fetching report detail:', error);
-      } finally {
         setLoading(false);
       }
     };
@@ -34,39 +40,52 @@ const HalamanDetailLaporanAdmin = () => {
   }, [reportId]);
 
   const handleStatusUpdate = async (newStatus) => {
-    // TODO: Update report status
     console.log('Updating report status:', reportId, newStatus);
   };
 
   const handleAddComment = async (comment) => {
-    // TODO: Add comment to report
     console.log('Adding comment:', comment);
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="d-flex">
+        <AdminSidebar />
+        <div className="flex-grow-1">
+          <AdminHeader title="Detail Laporan" />
+          <Container fluid className="py-5 text-center">
+            <Spinner animation="border" variant="primary" />
+            <p className="mt-3">Memuat detail laporan...</p>
+          </Container>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="halaman-detail-laporan-admin-page">
+    <div className="d-flex">
       <AdminSidebar />
-      <div className="halaman-detail-laporan-admin-content">
+      <div className="flex-grow-1">
         <AdminHeader title="Detail Laporan" />
-        <div className="report-detail-container">
-          <ReportDetailCard report={report} />
-          <div className="report-media">
-            <ReportPhotos photos={report?.photos || []} />
-            <ReportLocation location={report?.location} />
-          </div>
-          <ReportActions 
-            report={report}
-            onStatusUpdate={handleStatusUpdate}
-          />
-          <ReportComments 
-            reportId={reportId}
-            onAddComment={handleAddComment}
-          />
-        </div>
+        <Container fluid className="py-4">
+          <Row>
+            <Col lg={8}>
+              <ReportDetailCard report={report} />
+              <ReportComments 
+                reportId={reportId}
+                onAddComment={handleAddComment}
+              />
+            </Col>
+            <Col lg={4}>
+              <ReportActions 
+                report={report}
+                onStatusUpdate={handleStatusUpdate}
+              />
+              <ReportPhotos photos={report?.photos || []} />
+              <ReportLocation location={report?.location} />
+            </Col>
+          </Row>
+        </Container>
       </div>
     </div>
   );

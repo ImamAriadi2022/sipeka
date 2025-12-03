@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { Badge, Button, Card, Spinner, Table } from 'react-bootstrap';
+import { FaEye, FaSort, FaSortDown, FaSortUp } from 'react-icons/fa';
 
 const HistoryTable = ({ historyData, loading }) => {
   const [sortConfig, setSortConfig] = useState({
@@ -34,20 +36,20 @@ const HistoryTable = ({ historyData, loading }) => {
 
   const getSortIcon = (columnKey) => {
     if (sortConfig.key === columnKey) {
-      return sortConfig.direction === 'asc' ? '▲' : '▼';
+      return sortConfig.direction === 'asc' ? <FaSortUp /> : <FaSortDown />;
     }
-    return '▲▼';
+    return <FaSort className="text-muted" />;
   };
 
   const getStatusBadge = (status) => {
     const statusConfig = {
-      success: { label: 'Berhasil', class: 'success' },
-      pending: { label: 'Pending', class: 'warning' },
-      failed: { label: 'Gagal', class: 'danger' }
+      success: { label: 'Berhasil', variant: 'success' },
+      pending: { label: 'Pending', variant: 'warning' },
+      failed: { label: 'Gagal', variant: 'danger' }
     };
     
-    const config = statusConfig[status] || { label: status, class: 'secondary' };
-    return <span className={`status-badge ${config.class}`}>{config.label}</span>;
+    const config = statusConfig[status] || { label: status, variant: 'secondary' };
+    return <Badge bg={config.variant}>{config.label}</Badge>;
   };
 
   const getActionIcon = (actionType) => {
@@ -75,53 +77,72 @@ const HistoryTable = ({ historyData, loading }) => {
 
   if (loading) {
     return (
-      <div className="history-table loading">
-        <div className="loading-spinner">
-          <div className="spinner"></div>
-          <p>Memuat riwayat aktivitas...</p>
-        </div>
-      </div>
+      <Card>
+        <Card.Body className="text-center py-5">
+          <Spinner animation="border" variant="primary" />
+          <p className="mt-3 mb-0">Memuat riwayat aktivitas...</p>
+        </Card.Body>
+      </Card>
     );
   }
 
-  const sortedData = sortData(historyData, sortConfig);
+  const sortedData = sortData(historyData || [], sortConfig);
 
   return (
-    <div className="history-table">
-      <div className="table-header">
-        <h4>Riwayat Aktivitas ({historyData.length} aktivitas)</h4>
-      </div>
-      
-      <div className="table-container">
-        <table className="data-table">
-          <thead>
+    <Card>
+      <Card.Header className="d-flex justify-content-between align-items-center">
+        <h5 className="mb-0">Riwayat Aktivitas ({(historyData || []).length} aktivitas)</h5>
+      </Card.Header>
+      <Card.Body className="p-0">
+        <Table responsive hover className="mb-0">
+          <thead className="table-dark">
             <tr>
-              <th onClick={() => handleSort('timestamp')} className="sortable">
+              <th 
+                onClick={() => handleSort('timestamp')} 
+                style={{ cursor: 'pointer' }}
+                className="user-select-none"
+              >
                 Waktu {getSortIcon('timestamp')}
               </th>
-              <th onClick={() => handleSort('actionType')} className="sortable">
+              <th 
+                onClick={() => handleSort('actionType')} 
+                style={{ cursor: 'pointer' }}
+                className="user-select-none"
+              >
                 Aktivitas {getSortIcon('actionType')}
               </th>
-              <th onClick={() => handleSort('description')} className="sortable">
+              <th 
+                onClick={() => handleSort('description')} 
+                style={{ cursor: 'pointer' }}
+                className="user-select-none"
+              >
                 Deskripsi {getSortIcon('description')}
               </th>
-              <th onClick={() => handleSort('admin')} className="sortable">
+              <th 
+                onClick={() => handleSort('admin')} 
+                style={{ cursor: 'pointer' }}
+                className="user-select-none"
+              >
                 Admin {getSortIcon('admin')}
               </th>
-              <th onClick={() => handleSort('status')} className="sortable">
+              <th 
+                onClick={() => handleSort('status')} 
+                style={{ cursor: 'pointer' }}
+                className="user-select-none"
+              >
                 Status {getSortIcon('status')}
               </th>
-              <th>Detail</th>
+              <th width="100">Aksi</th>
             </tr>
           </thead>
           <tbody>
             {sortedData.length === 0 ? (
               <tr>
-                <td colSpan="6" className="no-data">
-                  <div className="no-data-message">
-                    <span>📭</span>
-                    <p>Tidak ada riwayat aktivitas ditemukan</p>
-                    <small>Coba ubah filter atau periode waktu</small>
+                <td colSpan="6" className="text-center py-5">
+                  <div>
+                    <div className="fs-1">📭</div>
+                    <p className="mb-1">Tidak ada riwayat aktivitas ditemukan</p>
+                    <small className="text-muted">Coba ubah filter atau periode waktu</small>
                   </div>
                 </td>
               </tr>
@@ -129,60 +150,56 @@ const HistoryTable = ({ historyData, loading }) => {
               sortedData.map((item, index) => {
                 const datetime = formatDateTime(item.timestamp);
                 return (
-                  <tr key={index} className="table-row">
-                    <td className="datetime-cell">
-                      <div className="datetime">
-                        <span className="date">{datetime.date}</span>
-                        <span className="time">{datetime.time}</span>
+                  <tr key={index}>
+                    <td>
+                      <div>
+                        <div className="fw-bold">{datetime.date}</div>
+                        <small className="text-muted">{datetime.time}</small>
                       </div>
                     </td>
-                    <td className="action-cell">
-                      <div className="action-info">
-                        <span className="action-icon">
-                          {getActionIcon(item.actionType)}
-                        </span>
-                        <span className="action-name">{item.actionName}</span>
+                    <td>
+                      <div className="d-flex align-items-center">
+                        <span className="me-2">{getActionIcon(item.actionType)}</span>
+                        <span>{item.actionName}</span>
                       </div>
                     </td>
-                    <td className="description-cell">
-                      <div className="description">
+                    <td>
+                      <div>
                         {item.description}
                         {item.target && (
-                          <small className="target-info">
-                            Target: {item.target}
-                          </small>
+                          <div><small className="text-muted">Target: {item.target}</small></div>
                         )}
                       </div>
                     </td>
-                    <td className="admin-cell">
-                      <div className="admin-info">
-                        <span className="admin-name">{item.admin}</span>
-                        <small className="admin-role">{item.adminRole}</small>
+                    <td>
+                      <div>
+                        <div className="fw-bold">{item.admin}</div>
+                        <small className="text-muted">{item.adminRole}</small>
                       </div>
                     </td>
-                    <td className="status-cell">
+                    <td>
                       {getStatusBadge(item.status)}
                     </td>
-                    <td className="actions-cell">
-                      <button 
-                        className="detail-btn"
+                    <td>
+                      <Button 
+                        variant="outline-primary"
+                        size="sm"
                         onClick={() => {
-                          // TODO: Implement detail view
                           console.log('Show detail for:', item);
                         }}
                         title="Lihat detail aktivitas"
                       >
-                        👁️
-                      </button>
+                        <FaEye />
+                      </Button>
                     </td>
                   </tr>
                 );
               })
             )}
           </tbody>
-        </table>
-      </div>
-    </div>
+        </Table>
+      </Card.Body>
+    </Card>
   );
 };
 

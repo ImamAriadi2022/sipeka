@@ -28,98 +28,112 @@ const HistoryFilters = ({ onFilterChange, filters }) => {
   };
 
   return (
-    <div className="history-filters">
-      <h4>Filter Riwayat</h4>
-      <div className="filters-row">
-        {/* Search */}
-        <div className="filter-group">
-          <label>Cari Aktivitas</label>
-          <input
-            type="text"
-            placeholder="Cari berdasarkan deskripsi..."
-            value={localFilters.searchTerm}
-            onChange={(e) => handleFilterChange('searchTerm', e.target.value)}
-            className="filter-input"
-          />
-        </div>
+    <Card className="mb-4">
+      <Card.Header>
+        <h5 className="mb-0">Filter Riwayat</h5>
+      </Card.Header>
+      <Card.Body>
+        <Row className="g-3">
+          {/* Search */}
+          <Col md={6} lg={4}>
+            <Form.Group>
+              <Form.Label>Cari Aktivitas</Form.Label>
+              <InputGroup>
+                <InputGroup.Text><FaSearch /></InputGroup.Text>
+                <Form.Control
+                  type="text"
+                  placeholder="Cari berdasarkan deskripsi..."
+                  value={localFilters.searchTerm}
+                  onChange={(e) => handleFilterChange('searchTerm', e.target.value)}
+                />
+              </InputGroup>
+            </Form.Group>
+          </Col>
 
-        {/* Date Range */}
-        <div className="filter-group">
-          <label>Periode</label>
-          <select
-            value={localFilters.dateRange}
-            onChange={(e) => handleFilterChange('dateRange', e.target.value)}
-            className="filter-select"
-          >
-            <option value="today">Hari Ini</option>
-            <option value="yesterday">Kemarin</option>
-            <option value="this-week">Minggu Ini</option>
-            <option value="this-month">Bulan Ini</option>
-            <option value="last-month">Bulan Lalu</option>
-            <option value="custom">Custom Range</option>
-          </select>
-        </div>
+          {/* Date Range */}
+          <Col md={6} lg={2}>
+            <Form.Group>
+              <Form.Label>Periode</Form.Label>
+              <Form.Select
+                value={localFilters.dateRange}
+                onChange={(e) => handleFilterChange('dateRange', e.target.value)}
+              >
+                <option value="today">Hari Ini</option>
+                <option value="yesterday">Kemarin</option>
+                <option value="this-week">Minggu Ini</option>
+                <option value="this-month">Bulan Ini</option>
+                <option value="last-month">Bulan Lalu</option>
+                <option value="custom">Custom Range</option>
+              </Form.Select>
+            </Form.Group>
+          </Col>
 
-        {/* Action Type */}
-        <div className="filter-group">
-          <label>Jenis Aktivitas</label>
-          <select
-            value={localFilters.actionType}
-            onChange={(e) => handleFilterChange('actionType', e.target.value)}
-            className="filter-select"
-          >
-            <option value="all">Semua Aktivitas</option>
-            <option value="create">Membuat Laporan</option>
-            <option value="update">Update Status</option>
-            <option value="delete">Hapus Data</option>
-            <option value="assign">Assign Petugas</option>
-            <option value="validate">Validasi</option>
-            <option value="export">Export Data</option>
-          </select>
-        </div>
+          {/* Action Type */}
+          <Col md={6} lg={2}>
+            <Form.Group>
+              <Form.Label>Jenis Aktivitas</Form.Label>
+              <Form.Select
+                value={localFilters.actionType}
+                onChange={(e) => handleFilterChange('actionType', e.target.value)}
+              >
+                <option value="all">Semua Aktivitas</option>
+                <option value="create">Membuat Laporan</option>
+                <option value="update">Update Status</option>
+                <option value="delete">Hapus Data</option>
+                <option value="assign">Assign Petugas</option>
+                <option value="validate">Validasi</option>
+                <option value="export">Export Data</option>
+              </Form.Select>
+            </Form.Group>
+          </Col>
 
-        {/* Admin Filter */}
-        <div className="filter-group">
-          <label>Admin</label>
-          <select
-            value={localFilters.admin}
-            onChange={(e) => handleFilterChange('admin', e.target.value)}
-            className="filter-select"
-          >
-            <option value="all">Semua Admin</option>
-            <option value="admin1">Admin 1</option>
-            <option value="admin2">Admin 2</option>
-            <option value="admin3">Admin 3</option>
-          </select>
-        </div>
+          {/* Admin Filter */}
+          <Col md={6} lg={2}>
+            <Form.Group>
+              <Form.Label>Admin</Form.Label>
+              <Form.Select
+                value={localFilters.admin}
+                onChange={(e) => handleFilterChange('admin', e.target.value)}
+              >
+                <option value="all">Semua Admin</option>
+                <option value="admin1">Admin 1</option>
+                <option value="admin2">Admin 2</option>
+                <option value="admin3">Admin 3</option>
+              </Form.Select>
+            </Form.Group>
+          </Col>
 
-        {/* Status Filter */}
-        <div className="filter-group">
-          <label>Status</label>
-          <select
-            value={localFilters.status}
-            onChange={(e) => handleFilterChange('status', e.target.value)}
-            className="filter-select"
-          >
-            <option value="all">Semua Status</option>
-            <option value="success">Berhasil</option>
-            <option value="pending">Pending</option>
-            <option value="failed">Gagal</option>
-          </select>
-        </div>
-
-        {/* Reset Button */}
-        <div className="filter-group">
-          <button 
-            onClick={resetFilters}
-            className="reset-filters-btn"
-            title="Reset semua filter"
-          >
-            🔄 Reset
-          </button>
-        </div>
-      </div>
-    </div>
+          {/* Status Filter */}
+          <Col md={6} lg={2}>
+            <Form.Group>
+              <Form.Label>Status</Form.Label>
+              <Form.Select
+                value={localFilters.status}
+                onChange={(e) => handleFilterChange('status', e.target.value)}
+              >
+                <option value="all">Semua Status</option>
+                <option value="success">Berhasil</option>
+                <option value="pending">Pending</option>
+                <option value="failed">Gagal</option>
+              </Form.Select>
+            </Form.Group>
+          </Col>
+        </Row>
+        
+        <Row className="mt-3">
+          <Col>
+            <Button 
+              variant="outline-secondary"
+              onClick={resetFilters}
+              size="sm"
+            >
+              <FaUndo className="me-1" />
+              Reset Filter
+            </Button>
+          </Col>
+        </Row>
+      </Card.Body>
+    </Card>
   );
 };
 

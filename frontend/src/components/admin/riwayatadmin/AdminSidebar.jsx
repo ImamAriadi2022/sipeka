@@ -1,36 +1,49 @@
+import { Badge, Nav } from 'react-bootstrap';
+import {
+    FaChartBar,
+    FaCheckCircle,
+    FaClipboardList,
+    FaCog,
+    FaHome,
+    FaSignOutAlt,
+    FaUsers
+} from 'react-icons/fa';
 
 const AdminSidebar = () => {
   const menuItems = [
-    { label: 'Dashboard Admin', path: '/admin/dashboard', icon: '🏠' },
-    { label: 'Kelola Laporan', path: '/admin/laporan', icon: '📋' },
-    { label: 'Validasi Pimpinan', path: '/admin/validasi-pimpinan', icon: '✅' },
-    { label: 'Riwayat Aktivitas', path: '/admin/riwayat', icon: '📊', active: true },
-    { label: 'Manajemen User', path: '/admin/users', icon: '👥' },
-    { label: 'Pengaturan', path: '/admin/settings', icon: '⚙️' },
-    { label: 'Logout', path: '/logout', icon: '🚪' }
+    { label: 'Dashboard Admin', path: '/admin/dashboard', icon: FaHome },
+    { label: 'Kelola Laporan', path: '/admin/laporan', icon: FaClipboardList },
+    { label: 'Validasi Pimpinan', path: '/admin/validasi-pimpinan', icon: FaCheckCircle },
+    { label: 'Riwayat Aktivitas', path: '/admin/riwayat', icon: FaChartBar, active: true },
+    { label: 'Manajemen User', path: '/admin/users', icon: FaUsers },
+    { label: 'Pengaturan', path: '/admin/settings', icon: FaCog },
+    { label: 'Logout', path: '/logout', icon: FaSignOutAlt }
   ];
 
   return (
-    <div className="admin-sidebar">
-      <div className="sidebar-header">
-        <h2>Sipeka Admin</h2>
-        <span className="admin-badge">Administrator</span>
+    <div className="d-flex flex-column bg-dark text-white" style={{ width: '250px', minHeight: '100vh' }}>
+      <div className="p-4 border-bottom border-secondary">
+        <h4 className="mb-0 text-primary">Sipeka Admin</h4>
+        <Badge bg="success" className="mt-2">Administrator</Badge>
       </div>
-      <nav className="sidebar-nav">
-        <ul>
-          {menuItems.map((item, index) => (
-            <li key={index}>
-              <a 
-                href={item.path} 
-                className={`sidebar-link ${item.active ? 'active' : ''}`}
+      <Nav className="flex-column flex-grow-1 p-3">
+        {menuItems.map((item, index) => {
+          const IconComponent = item.icon;
+          return (
+            <Nav.Item key={index} className="mb-2">
+              <Nav.Link 
+                href={item.path}
+                className={`d-flex align-items-center text-white p-3 rounded ${item.active ? 'bg-primary' : ''}`}
+                style={{ textDecoration: 'none' }}
               >
-                <span className="icon">{item.icon}</span>
-                <span className="label">{item.label}</span>
-              </a>
-            </li>
-          ))}
-        </ul>
-      </nav>
+                <IconComponent className="me-3" size={18} />
+                {item.label}
+                {item.active && <Badge bg="light" text="dark" className="ms-auto">Aktif</Badge>}
+              </Nav.Link>
+            </Nav.Item>
+          );
+        })}
+      </Nav>
     </div>
   );
 };

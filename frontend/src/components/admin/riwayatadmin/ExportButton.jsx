@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { Alert, Button, ButtonGroup, Card, ProgressBar } from 'react-bootstrap';
+import { FaDownload, FaFileCode, FaFileCsv, FaFilePdf, FaSpinner } from 'react-icons/fa';
 
 const ExportButton = ({ historyData, filters }) => {
   const [isExporting, setIsExporting] = useState(false);
@@ -117,57 +119,62 @@ const ExportButton = ({ historyData, filters }) => {
   };
 
   return (
-    <div className="export-section">
-      <h4>Export Riwayat</h4>
-      <div className="export-options">
-        <div className="export-info">
-          <span className="export-count">
-            📊 {historyData.length} aktivitas siap diekspor
-          </span>
-          <small className="export-note">
-            Data akan diekspor sesuai filter yang aktif
-          </small>
-        </div>
+    <Card className="mb-4">
+      <Card.Header className="d-flex justify-content-between align-items-center">
+        <h5 className="mb-0">
+          <FaDownload className="me-2" />
+          Export Riwayat
+        </h5>
+      </Card.Header>
+      <Card.Body>
+        <Alert variant="info" className="d-flex align-items-center">
+          <div>
+            <strong>{(historyData || []).length}</strong> aktivitas siap diekspor
+            <br />
+            <small>Data akan diekspor sesuai filter yang aktif</small>
+          </div>
+        </Alert>
         
-        <div className="export-buttons">
-          <button 
+        <ButtonGroup className="w-100 mb-3">
+          <Button 
+            variant="outline-success"
             onClick={() => handleExport('csv')}
-            disabled={isExporting || historyData.length === 0}
-            className="export-btn csv"
+            disabled={isExporting || (historyData || []).length === 0}
             title="Export ke file CSV (Excel compatible)"
           >
-            {isExporting ? '⏳' : '📈'} CSV
-          </button>
+            {isExporting ? <FaSpinner className="fa-spin me-1" /> : <FaFileCsv className="me-1" />}
+            CSV
+          </Button>
           
-          <button 
+          <Button 
+            variant="outline-primary"
             onClick={() => handleExport('json')}
-            disabled={isExporting || historyData.length === 0}
-            className="export-btn json"
+            disabled={isExporting || (historyData || []).length === 0}
             title="Export ke file JSON dengan metadata"
           >
-            {isExporting ? '⏳' : '📄'} JSON
-          </button>
+            {isExporting ? <FaSpinner className="fa-spin me-1" /> : <FaFileCode className="me-1" />}
+            JSON
+          </Button>
           
-          <button 
+          <Button 
+            variant="outline-danger"
             onClick={() => handleExport('pdf')}
-            disabled={isExporting || historyData.length === 0}
-            className="export-btn pdf"
+            disabled={isExporting || (historyData || []).length === 0}
             title="Export ke file PDF (coming soon)"
           >
-            {isExporting ? '⏳' : '📋'} PDF
-          </button>
-        </div>
+            {isExporting ? <FaSpinner className="fa-spin me-1" /> : <FaFilePdf className="me-1" />}
+            PDF
+          </Button>
+        </ButtonGroup>
         
         {isExporting && (
-          <div className="export-progress">
-            <div className="progress-bar">
-              <div className="progress-fill"></div>
-            </div>
-            <span className="progress-text">Memproses export...</span>
+          <div>
+            <ProgressBar animated now={100} className="mb-2" />
+            <small className="text-muted">Memproses export...</small>
           </div>
         )}
-      </div>
-    </div>
+      </Card.Body>
+    </Card>
   );
 };
 

@@ -1,4 +1,16 @@
 import { useState } from 'react';
+import { Badge, Button, Nav } from 'react-bootstrap';
+import {
+    FaBuilding,
+    FaChartBar,
+    FaCheckCircle,
+    FaChevronLeft,
+    FaChevronRight,
+    FaClipboardList,
+    FaCog,
+    FaHome,
+    FaSignOutAlt
+} from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 
 const AdminSidebar = () => {
@@ -6,11 +18,11 @@ const AdminSidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const menuItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: '🏠', path: '/admin/dashboard' },
-    { id: 'kelola-laporan', label: 'Kelola Laporan', icon: '📋', path: '/admin/kelola-laporan', active: true },
-    { id: 'validasi-pimpinan', label: 'Validasi Pimpinan', icon: '✅', path: '/admin/validasi-pimpinan' },
-    { id: 'riwayat-admin', label: 'Riwayat Admin', icon: '📊', path: '/admin/riwayat-admin' },
-    { id: 'pengaturan', label: 'Pengaturan', icon: '⚙️', path: '/admin/pengaturan' }
+    { id: 'dashboard', label: 'Dashboard', icon: FaHome, path: '/admin/dashboard' },
+    { id: 'kelola-laporan', label: 'Kelola Laporan', icon: FaClipboardList, path: '/admin/kelola-laporan', active: true },
+    { id: 'validasi-pimpinan', label: 'Validasi Pimpinan', icon: FaCheckCircle, path: '/admin/validasi-pimpinan' },
+    { id: 'riwayat-admin', label: 'Riwayat Admin', icon: FaChartBar, path: '/admin/riwayat-admin' },
+    { id: 'pengaturan', label: 'Pengaturan', icon: FaCog, path: '/admin/pengaturan' }
   ];
 
   const handleMenuClick = (path) => {
@@ -27,55 +39,70 @@ const AdminSidebar = () => {
   };
 
   return (
-    <div className={`admin-sidebar ${isCollapsed ? 'collapsed' : ''}`}>
-      <div className="sidebar-header">
-        <div className="logo">
-          <span className="logo-icon">🏛️</span>
-          {!isCollapsed && <span className="logo-text">SIPEKA Admin</span>}
+    <div className={`d-flex flex-column bg-dark text-white ${isCollapsed ? 'collapsed-sidebar' : 'expanded-sidebar'}`} style={{ minHeight: '100vh', width: isCollapsed ? '80px' : '250px', transition: 'width 0.3s' }}>
+      <div className="p-3 border-bottom border-secondary">
+        <div className="d-flex align-items-center justify-content-between">
+          <div className="d-flex align-items-center">
+            <FaBuilding size={24} className="text-primary" />
+            {!isCollapsed && <span className="ms-2 fw-bold">SIPEKA Admin</span>}
+          </div>
+          <Button 
+            variant="outline-secondary"
+            size="sm"
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          >
+            {isCollapsed ? <FaChevronRight /> : <FaChevronLeft />}
+          </Button>
         </div>
-        <button 
-          className="collapse-btn"
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-        >
-          {isCollapsed ? '→' : '←'}
-        </button>
       </div>
 
-      <nav className="sidebar-nav">
-        <ul className="nav-menu">
-          {menuItems.map((item) => (
-            <li key={item.id} className={`nav-item ${item.active ? 'active' : ''}`}>
-              <button 
+      <Nav className="flex-column flex-grow-1 p-2">
+        {menuItems.map((item) => {
+          const IconComponent = item.icon;
+          return (
+            <Nav.Item key={item.id} className="mb-1">
+              <Nav.Link 
                 onClick={() => handleMenuClick(item.path)}
-                className="nav-link"
+                className={`d-flex align-items-center text-white p-2 rounded ${item.active ? 'bg-primary' : 'hover-bg-secondary'}`}
                 title={isCollapsed ? item.label : ''}
+                style={{ cursor: 'pointer' }}
               >
-                <span className="nav-icon">{item.icon}</span>
-                {!isCollapsed && <span className="nav-label">{item.label}</span>}
-              </button>
-            </li>
-          ))}
-        </ul>
-      </nav>
+                <IconComponent size={18} />
+                {!isCollapsed && (
+                  <span className="ms-2">{item.label}</span>
+                )}
+                {item.active && !isCollapsed && (
+                  <Badge bg="light" text="dark" className="ms-auto">Aktif</Badge>
+                )}
+              </Nav.Link>
+            </Nav.Item>
+          );
+        })}
+      </Nav>
 
-      <div className="sidebar-footer">
-        <div className="user-info">
-          <div className="user-avatar">👤</div>
+      <div className="p-3 border-top border-secondary">
+        <div className="d-flex align-items-center mb-2">
+          <div className="bg-secondary rounded-circle d-flex align-items-center justify-content-center" style={{ width: '32px', height: '32px' }}>
+            <span>👤</span>
+          </div>
           {!isCollapsed && (
-            <div className="user-details">
-              <span className="user-name">Admin User</span>
-              <span className="user-role">Administrator</span>
+            <div className="ms-2">
+              <div className="small fw-bold">Admin User</div>
+              <div className="small text-muted">Administrator</div>
             </div>
           )}
         </div>
-        <button 
+        <Button 
+          variant="outline-danger"
+          size="sm"
           onClick={handleLogout}
-          className="logout-btn"
+          className="w-100"
           title="Logout"
         >
-          🚪 {!isCollapsed && 'Logout'}
-        </button>
+          <FaSignOutAlt className="me-1" />
+          {!isCollapsed && 'Logout'}
+        </Button>
       </div>
     </div>
   );
