@@ -1,19 +1,15 @@
 import { useEffect, useState } from 'react';
-import AdminHeader from '../../components/admin/dashboard/AdminHeader';
-import AdminSidebar from '../../components/admin/dashboard/AdminSidebar';
-import AdminStatsCard from '../../components/admin/dashboard/AdminStatsCard';
-import ReportsOverview from '../../components/admin/dashboard/ReportsOverview';
-import SystemHealth from '../../components/admin/dashboard/SystemHealth';
-import UserActivity from '../../components/admin/dashboard/UserActivity';
+import { Card } from 'react-bootstrap';
+import AdminChart from '../../components/admin/dashboard/AdminChart';
+import AdminStats from '../../components/admin/dashboard/AdminStats';
+import AdminLayout from '../../layouts/AdminLayout';
 
 const DashboardAdmin = () => {
-  const [adminStats, setAdminStats] = useState({
-    totalUsers: 0,
-    totalReports: 0,
-    pendingReports: 0,
-    resolvedReports: 0,
-    activeUsers: 0,
-    systemUptime: '99.9%'
+  const [stats, setStats] = useState({
+    totalMasuk: 670,
+    selesai: 550,
+    proses: 100,
+    verifikasi: 20,
   });
 
   useEffect(() => {
@@ -25,25 +21,17 @@ const DashboardAdmin = () => {
   }, []);
 
   return (
-    <div className="dashboard-admin-page">
-      <AdminSidebar />
-      <div className="dashboard-admin-content">
-        <AdminHeader title="Dashboard Admin" />
-        <div className="admin-stats-grid">
-          <AdminStatsCard title="Total Users" value={adminStats.totalUsers} />
-          <AdminStatsCard title="Total Laporan" value={adminStats.totalReports} />
-          <AdminStatsCard title="Laporan Pending" value={adminStats.pendingReports} />
-          <AdminStatsCard title="Laporan Selesai" value={adminStats.resolvedReports} />
-          <AdminStatsCard title="User Aktif" value={adminStats.activeUsers} />
-          <AdminStatsCard title="System Uptime" value={adminStats.systemUptime} />
-        </div>
-        <div className="admin-widgets">
-          <ReportsOverview />
-          <UserActivity />
-          <SystemHealth />
-        </div>
-      </div>
-    </div>
+    <AdminLayout>
+      <h5 className="text-center fw-bold mb-3" style={{ color: '#333' }}>Dashboard</h5>
+      <Card className="mx-auto" style={{ maxWidth: '900px', border: '4px solid #2b5cab', borderRadius: 10 }}>
+        <Card.Body style={{ background: '#eef3fb', padding: 18 }}>
+          <div className="mx-auto" style={{ maxWidth: '820px' }}>
+            <AdminChart total={stats.totalMasuk} />
+            <AdminStats selesai={stats.selesai} proses={stats.proses} verifikasi={stats.verifikasi} />
+          </div>
+        </Card.Body>
+      </Card>
+    </AdminLayout>
   );
 };
 

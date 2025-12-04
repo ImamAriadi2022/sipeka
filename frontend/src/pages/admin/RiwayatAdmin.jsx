@@ -1,11 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Col, Container, Row } from 'react-bootstrap';
-import AdminHeader from '../../components/admin/riwayatadmin/AdminHeader';
-import AdminSidebar from '../../components/admin/riwayatadmin/AdminSidebar';
-import ExportButton from '../../components/admin/riwayatadmin/ExportButton';
-import HistoryFilters from '../../components/admin/riwayatadmin/HistoryFilters';
-import HistoryStats from '../../components/admin/riwayatadmin/HistoryStats';
-import HistoryTable from '../../components/admin/riwayatadmin/HistoryTable';
+import HistoryList from '../../components/admin/riwayatadmin/HistoryList';
+import AdminLayout from '../../layouts/AdminLayout';
 
 const HalamanRiwayatAdmin = () => {
   const [historyData, setHistoryData] = useState([]);
@@ -58,25 +53,19 @@ const HalamanRiwayatAdmin = () => {
     // TODO: Fetch filtered data
   };
 
+  const reports = JSON.parse(localStorage.getItem('reports') || '[]');
+  const historyItems = reports.map((r, idx) => ({
+    id: r.id || idx + 1,
+    location: r.location,
+    title: r.title,
+    status: r.status === 'Menunggu' ? 'Proses' : r.status || 'Selesai',
+  }));
+
   return (
-    <div className="d-flex">
-      <AdminSidebar />
-      <div className="flex-grow-1">
-        <AdminHeader title="Riwayat Aktivitas Admin" />
-        <Container fluid className="py-4">
-          <HistoryStats stats={stats} />
-          <HistoryFilters filters={filters} onFilterChange={handleFilterChange} />
-          <Row>
-            <Col lg={8}>
-              <HistoryTable historyData={historyData} loading={loading} />
-            </Col>
-            <Col lg={4}>
-              <ExportButton historyData={historyData} filters={filters} />
-            </Col>
-          </Row>
-        </Container>
-      </div>
-    </div>
+    <AdminLayout>
+      <h5 className="text-center fw-bold mb-3" style={{ color: '#333' }}>Laporan Masuk</h5>
+      <HistoryList items={historyItems} onDetail={(item) => console.log('Detil riwayat', item)} />
+    </AdminLayout>
   );
 };
 

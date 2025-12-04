@@ -1,37 +1,55 @@
-
 const AdminSidebar = () => {
   const menuItems = [
-    { label: 'Dashboard Admin', path: '/admin/dashboard', icon: '🏠', active: true },
-    { label: 'Kelola Laporan', path: '/admin/laporan', icon: '📋' },
+    { label: 'Dashboard', path: '/admin/dashboard', icon: '🏠' },
+    { label: 'Kelola Laporan', path: '/admin/laporan', icon: '📝' },
     { label: 'Validasi Pimpinan', path: '/admin/validasi-pimpinan', icon: '✅' },
-    { label: 'Riwayat Aktivitas', path: '/admin/riwayat', icon: '📊' },
-    { label: 'Manajemen User', path: '/admin/users', icon: '👥' },
-    { label: 'Pengaturan', path: '/admin/settings', icon: '⚙️' },
+    { label: 'Riwayat', path: '/admin/riwayat', icon: '📋' },
     { label: 'Logout', path: '/logout', icon: '🚪' }
   ];
 
+  const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
+
+  const navigate = (path) => {
+    if (path === '/logout') {
+      try {
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('userRole');
+        localStorage.removeItem('currentUser');
+      } catch {}
+      window.history.pushState({}, '', '/login');
+      window.location.reload();
+      return;
+    }
+    window.history.pushState({}, '', path);
+    window.location.reload();
+  };
+
   return (
-    <div className="admin-sidebar">
+    <aside className="sidebar">
       <div className="sidebar-header">
-        <h2>Sipeka Admin</h2>
-        <span className="admin-badge">Administrator</span>
+        <img src="/img/logo-unila.png" alt="Logo" className="sidebar-logo" />
+        <div className="sidebar-title">SIPEKA</div>
       </div>
       <nav className="sidebar-nav">
         <ul>
-          {menuItems.map((item, index) => (
-            <li key={index}>
-              <a 
-                href={item.path} 
-                className={`sidebar-link ${item.active ? 'active' : ''}`}
-              >
-                <span className="icon">{item.icon}</span>
-                <span className="label">{item.label}</span>
-              </a>
-            </li>
-          ))}
+          {menuItems.map((item, index) => {
+            const active = item.path !== '/logout' && currentPath === item.path;
+            return (
+              <li key={index}>
+                <button
+                  type="button"
+                  onClick={() => navigate(item.path)}
+                  className={`sidebar-link ${active ? 'active' : ''}`}
+                >
+                  <span className="icon" aria-hidden>{item.icon}</span>
+                  <span className="label">{item.label}</span>
+                </button>
+              </li>
+            );
+          })}
         </ul>
       </nav>
-    </div>
+    </aside>
   );
 };
 

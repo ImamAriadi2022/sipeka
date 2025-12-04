@@ -1,9 +1,6 @@
 import { useEffect, useState } from 'react';
-import AdminHeader from '../../components/admin/kelolaalaporan/AdminHeader';
-import AdminSidebar from '../../components/admin/kelolaalaporan/AdminSidebar';
-import ReportFilters from '../../components/admin/kelolaalaporan/ReportFilters';
-import ReportPagination from '../../components/admin/kelolaalaporan/ReportPagination';
-import ReportTable from '../../components/admin/kelolaalaporan/ReportTable';
+import ReportList from '../../components/admin/kelolaalaporan/ReportList';
+import AdminLayout from '../../layouts/AdminLayout';
 
 const HalamanLaporanAdmin = () => {
   const [reports, setReports] = useState([]);
@@ -32,22 +29,18 @@ const HalamanLaporanAdmin = () => {
     console.log('Updating report status:', reportId, newStatus);
   };
 
+  const storedReports = JSON.parse(localStorage.getItem('reports') || '[]');
+  const list = storedReports.map((r, i) => ({ ...r, id: r.id || i + 1 }));
+
   return (
-    <div className="halaman-laporan-admin-page">
-      <AdminSidebar />
-      <div className="halaman-laporan-admin-content">
-        <AdminHeader title="Kelola Laporan" />
-        <ReportFilters filters={filters} onFiltersChange={setFilters} />
-        <ReportTable 
-          reports={reports} 
-          onStatusChange={handleStatusChange}
-        />
-        <ReportPagination 
-          pagination={pagination}
-          onPageChange={(page) => setPagination(prev => ({...prev, page}))}
-        />
-      </div>
-    </div>
+    <AdminLayout>
+      <h5 className="text-center fw-bold mb-3" style={{ color: '#333' }}>Laporan Masuk</h5>
+      <ReportList
+        reports={list}
+        onDetail={(r) => console.log('Detail laporan', r)}
+        onStatus={(r) => handleStatusChange(r.id, r.status)}
+      />
+    </AdminLayout>
   );
 };
 

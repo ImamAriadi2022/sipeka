@@ -7,6 +7,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 
 // User pages
+import UserLayout from './layouts/UserLayout';
 import BuatLaporan from './pages/user/BuatLaporan';
 import Dashboard from './pages/user/Dashboard';
 import Profil from './pages/user/Profil';
@@ -70,7 +71,15 @@ const SimpleRouter = () => {
     switch (currentPath) {
       case '/':
       case '/login':
-        return isAuthenticated ? <Dashboard /> : <Login />;
+        return isAuthenticated ? (
+          <ProtectedRoute>
+            <UserLayout>
+              <Dashboard />
+            </UserLayout>
+          </ProtectedRoute>
+        ) : (
+          <Login />
+        );
       
       case '/register':
         return <Register />;
@@ -78,28 +87,36 @@ const SimpleRouter = () => {
       case '/dashboard':
         return (
           <ProtectedRoute>
-            <Dashboard />
+            <UserLayout>
+              <Dashboard />
+            </UserLayout>
           </ProtectedRoute>
         );
       
       case '/buat-laporan':
         return (
           <ProtectedRoute>
-            <BuatLaporan />
+            <UserLayout>
+              <BuatLaporan />
+            </UserLayout>
           </ProtectedRoute>
         );
       
       case '/riwayat-laporan':
         return (
           <ProtectedRoute>
-            <RiwayatLaporan />
+            <UserLayout>
+              <RiwayatLaporan />
+            </UserLayout>
           </ProtectedRoute>
         );
       
       case '/profil':
         return (
           <ProtectedRoute>
-            <Profil />
+            <UserLayout>
+              <Profil />
+            </UserLayout>
           </ProtectedRoute>
         );
       

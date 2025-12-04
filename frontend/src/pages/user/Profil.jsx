@@ -1,10 +1,6 @@
 import { useEffect, useState } from 'react';
-import Header from '../../components/user/profil/Header';
-import PasswordChange from '../../components/user/profil/PasswordChange';
-import ProfileCard from '../../components/user/profil/ProfileCard';
-import ProfileForm from '../../components/user/profil/ProfileForm';
-import ProfileStats from '../../components/user/profil/ProfileStats';
-import Sidebar from '../../components/user/profil/Sidebar';
+import { Button, Card, Form, InputGroup, Modal } from 'react-bootstrap';
+import { FiEdit } from 'react-icons/fi';
 
 const Profil = () => {
   const [user, setUser] = useState(null);
@@ -34,44 +30,136 @@ const Profil = () => {
     setIsEditing(false);
   };
 
-  const handlePasswordChange = async (passwordData) => {
-    // TODO: Change user password
-    console.log('Changing password');
+  const [showPwdModal, setShowPwdModal] = useState(false);
+  const [pwdForm, setPwdForm] = useState({ current: '', next: '', confirm: '' });
+  const [pwdError, setPwdError] = useState('');
+
+  const openPwdModal = () => {
+    setPwdForm({ current: '', next: '', confirm: '' });
+    setPwdError('');
+    setShowPwdModal(true);
+  };
+
+  const closePwdModal = () => {
+    setShowPwdModal(false);
+  };
+
+  const handlePasswordChange = async (e) => {
+    e.preventDefault();
+    setPwdError('');
+    const storedUsers = JSON.parse(localStorage.getItem('users') || '[]');
+    const email = user?.email || 'keysha@gmail.com';
+    const idx = storedUsers.findIndex(u => u.email === email);
+    const currentUser = idx >= 0 ? storedUsers[idx] : null;
+
+    if (!currentUser) {
+      setPwdError('Profil tidak ditemukan.');
+      return;
+    }
+    if (!pwdForm.current || !pwdForm.next || !pwdForm.confirm) {
+      setPwdError('Semua kolom wajib diisi.');
+      return;
+    }
+    if (currentUser.password && pwdForm.current !== currentUser.password) {
+      setPwdError('Password saat ini tidak sesuai.');
+      return;
+    }
+    if (pwdForm.next.length < 6) {
+      setPwdError('Password baru minimal 6 karakter.');
+      return;
+    }
+    if (pwdForm.next !== pwdForm.confirm) {
+      setPwdError('Konfirmasi password tidak cocok.');
+      return;
+    }
+
+    storedUsers[idx] = { ...currentUser, password: pwdForm.next };
+    localStorage.setItem('users', JSON.stringify(storedUsers));
+    // Optionally update current user in storage
+    const cu = JSON.parse(localStorage.getItem('currentUser') || 'null');
+    if (cu && cu.email === email) {
+      localStorage.setItem('currentUser', JSON.stringify({ ...cu, password: pwdForm.next }));
+    }
+    closePwdModal();
+    alert('Password berhasil diubah.');
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div className="dashboard-content">Loading...</div>;
   }
 
   return (
-    <div className="profil-page">
-      <Sidebar />
-      <div className="profil-content">
-        <Header title="Profil Saya" />
-        <div className="profile-container">
-          <div className="profile-main">
-            <ProfileCard user={user} />
-            {isEditing ? (
-              <ProfileForm 
-                user={user}
-                onSubmit={handleProfileUpdate}
-                onCancel={() => setIsEditing(false)}
-              />
-            ) : (
-              <button 
-                className="edit-button"
-                onClick={() => setIsEditing(true)}
-              >
-                Edit Profil
-              </button>
+    <div className="dashboard-content">
+      <h5 className="text-center fw-bold mb-3" style={{ color: '#333' }}>Profil Saya</h5>
+      <Card className="mx-auto" style={{ maxWidth: '720px', border: '4px solid #2b5cab', borderRadius: 10 }}>
+        <Card.Body style={{ background: '#f3f6fb', padding: 18 }}>
+          <div className="d-flex flex-column align-items-center mb-3">
+            <div style={{ width: 92, height: 92, borderRadius: '50%', overflow: 'hidden', background: '#fff', border: '2px solid #cfd6e6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              {/* avatar placeholder; replace with user photo if available */}
+              <img src="/img/avatar.png" alt="avatar" style={{ width: 80, height: 80, objectFit: 'cover' }} />
+            </div>
+            <div className="small text-muted mt-2 text-center">Informasi mengenai profil anda ada disini!</div>
+          </div>
+
+          <div className="mx-auto" style={{ maxWidth: '540px' }}>
+            <div className="fw-bold small mb-1">Nama Lengkap</div>
+            <InputGroup className="mb-3">
+              <Form.Control type="text" value={user?.name || 'Keysha'} readOnly />
+            </InputGroup>
+
+            <div className="fw-bold small mb-1">Email</div>
+            <InputGroup className="mb-4">
+              <Form.Control type="email" value={user?.email || 'keysha@gmail.com'} readOnly />
+              <span className="input-group-text"><FiEdit /></span>
+            </InputGroup>
+
+            <div className="d-flex justify-content-center">
+              <Button variant="primary" onClick={openPwdModal}>Ubah Password</Button>
+            </div>
+          </div>
+        </Card.Body>
+      </Card>
+
+      <Modal show={showPwdModal} onHide={closePwdModal} centered>
+        <Form onSubmit={handlePasswordChange}>
+          <Modal.Header closeButton>
+            <Modal.Title>Ubah Password</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {pwdError && (
+              <div className="alert alert-danger py-2" role="alert">{pwdError}</div>
             )}
-          </div>
-          <div className="profile-sidebar">
-            <ProfileStats userId={user?.id} />
-            <PasswordChange onSubmit={handlePasswordChange} />
-          </div>
-        </div>
-      </div>
+            <Form.Group className="mb-3">
+              <Form.Label>Password Saat Ini</Form.Label>
+              <Form.Control
+                type="password"
+                value={pwdForm.current}
+                onChange={(e) => setPwdForm({ ...pwdForm, current: e.target.value })}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Password Baru</Form.Label>
+              <Form.Control
+                type="password"
+                value={pwdForm.next}
+                onChange={(e) => setPwdForm({ ...pwdForm, next: e.target.value })}
+              />
+            </Form.Group>
+            <Form.Group>
+              <Form.Label>Konfirmasi Password Baru</Form.Label>
+              <Form.Control
+                type="password"
+                value={pwdForm.confirm}
+                onChange={(e) => setPwdForm({ ...pwdForm, confirm: e.target.value })}
+              />
+            </Form.Group>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={closePwdModal}>Batal</Button>
+            <Button variant="primary" type="submit">Simpan</Button>
+          </Modal.Footer>
+        </Form>
+      </Modal>
     </div>
   );
 };

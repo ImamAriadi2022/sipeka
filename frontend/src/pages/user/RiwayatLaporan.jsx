@@ -1,74 +1,63 @@
-import { useEffect, useState } from 'react';
-import Header from '../../components/user/riwayatlaporan/Header';
-import ReportCard from '../../components/user/riwayatlaporan/ReportCard';
-import ReportFilters from '../../components/user/riwayatlaporan/ReportFilters';
-import ReportList from '../../components/user/riwayatlaporan/ReportList';
-import Sidebar from '../../components/user/riwayatlaporan/Sidebar';
+import { useState } from 'react';
+import { Badge, Button, Card, Form, InputGroup } from 'react-bootstrap';
+import { FiCalendar, FiEdit, FiImage } from 'react-icons/fi';
 
 const RiwayatLaporan = () => {
-  const [userReports, setUserReports] = useState([]);
-  const [filters, setFilters] = useState({
-    status: 'all',
-    dateRange: 'all',
-    category: 'all'
+  const [report, setReport] = useState({
+    location: 'Kamar Mandi lantai 1 gedung H Teknik Elektro',
+    title: 'Kran air tidak hidup',
+    date: '2025-10-10',
+    status: 'Menunggu',
   });
-  const [viewMode, setViewMode] = useState('list'); // 'list' or 'card'
-
-  useEffect(() => {
-    // TODO: Fetch user's reports history
-    const fetchUserReports = async () => {
-      // Implement API call
-    };
-    fetchUserReports();
-  }, [filters]);
-
-  const handleReportClick = (reportId) => {
-    // TODO: Navigate to report detail
-    console.log('Viewing report:', reportId);
-  };
 
   return (
-    <div className="riwayat-laporan-page">
-      <Sidebar />
-      <div className="riwayat-laporan-content">
-        <Header title="Riwayat Laporan Saya" />
-        <div className="riwayat-controls">
-          <ReportFilters filters={filters} onFiltersChange={setFilters} />
-          <div className="view-toggle">
-            <button 
-              className={viewMode === 'list' ? 'active' : ''}
-              onClick={() => setViewMode('list')}
-            >
-              List View
-            </button>
-            <button 
-              className={viewMode === 'card' ? 'active' : ''}
-              onClick={() => setViewMode('card')}
-            >
-              Card View
-            </button>
-          </div>
-        </div>
-        <div className="reports-container">
-          {viewMode === 'list' ? (
-            <ReportList 
-              reports={userReports} 
-              onReportClick={handleReportClick}
-            />
-          ) : (
-            <div className="reports-grid">
-              {userReports.map(report => (
-                <ReportCard 
-                  key={report.id}
-                  report={report}
-                  onClick={() => handleReportClick(report.id)}
-                />
-              ))}
+    <>
+      <h5 className="text-center fw-bold mb-3" style={{ color: '#333' }}>Riwayat Laporan</h5>
+      <Card className="mx-auto" style={{ maxWidth: '900px', border: '4px solid #2b5cab', borderRadius: 10 }}>
+        <Card.Body style={{ background: '#f3f6fb', padding: 18 }}>
+          <div className="mx-auto" style={{ maxWidth: '820px' }}>
+            <div className="mb-3">
+              <div className="fw-bold small mb-1">Lokasi Kerusakan</div>
+              <InputGroup>
+                <Form.Control type="text" value={report.location} readOnly />
+                <span className="input-group-text"><FiEdit /></span>
+              </InputGroup>
             </div>
-          )}
-        </div>
-      </div>
-    </div>
+
+            <div className="mb-3">
+              <div className="fw-bold small mb-1">Jenis Kerusakan</div>
+              <InputGroup>
+                <Form.Control type="text" value={report.title} readOnly />
+                <span className="input-group-text"><FiEdit /></span>
+              </InputGroup>
+            </div>
+
+            <div className="mb-3">
+              <div className="fw-bold small mb-1">Tanggal Pelaporan</div>
+              <InputGroup>
+                <Form.Control type="date" value={report.date} readOnly />
+                <span className="input-group-text"><FiCalendar /></span>
+              </InputGroup>
+            </div>
+
+            <div className="mb-3">
+              <div className="fw-bold small mb-1">Status Laporan</div>
+              <Badge bg="danger">{report.status}</Badge>
+            </div>
+
+            <div className="mb-4 d-flex justify-content-center">
+              <div style={{ width: 140, height: 100, border: '2px dashed #cfd6e6', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff' }}>
+                <FiImage size={40} color="#6b7a99" />
+              </div>
+            </div>
+
+            <div className="d-flex justify-content-center">
+              <Button variant="warning">Hapus Laporan</Button>
+            </div>
+          </div>
+        </Card.Body>
+      </Card>
+    </>
   );
 };
 
