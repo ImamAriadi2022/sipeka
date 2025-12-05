@@ -1,8 +1,10 @@
-import { Badge, Button, Table } from 'react-bootstrap';
+import { useState } from 'react';
+import { Badge, Button, Modal, Table } from 'react-bootstrap';
 import AdminLayout from '../../layouts/AdminLayout';
 
 const ValidasiPimpinan = () => {
   const reports = JSON.parse(localStorage.getItem('reports') || '[]');
+  const [selected, setSelected] = useState(null);
 
   const updateStatus = (id, status) => {
     const updated = reports.map(r => (r.id === id ? { ...r, status } : r));
@@ -41,6 +43,7 @@ const ValidasiPimpinan = () => {
                 <td>{r.date}</td>
                 <td><Badge bg="warning" text="dark">{r.status}</Badge></td>
                 <td className="d-flex gap-2">
+                  <Button variant="primary" size="sm" onClick={() => setSelected(r)}>Detail</Button>
                   <Button variant="success" size="sm" onClick={() => updateStatus(r.id, 'Disetujui')}>Setujui</Button>
                   <Button variant="danger" size="sm" onClick={() => updateStatus(r.id, 'Ditolak')}>Tolak</Button>
                 </td>
@@ -49,6 +52,42 @@ const ValidasiPimpinan = () => {
           </tbody>
         </Table>
       </div>
+
+      <Modal show={!!selected} onHide={() => setSelected(null)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Detail Laporan</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {selected && (
+            <div className="small">
+              <div className="mb-2"><strong>Judul:</strong> {selected.title}</div>
+              <div className="mb-2"><strong>Lokasi:</strong> {selected.location}</div>
+              <div className="mb-2"><strong>Tanggal:</strong> {selected.date || '-'}</div>
+              <div className="mb-2 d-flex align-items-center gap-2">
+                <strong>Status:</strong>
+                <Badge bg={selected.status === 'Ditolak' ? 'danger' : selected.status === 'Disetujui' || selected.status === 'Diterima' ? 'success' : 'warning'} text={selected.status === 'Menunggu' ? 'dark' : undefined}>{selected.status}</Badge>
+              </div>
+              {selected.description && (
+                <div className="mb-2"><strong>Deskripsi:</strong> {selected.description}</div>
+              )}
+              <div className="mt-3">
+                <div className="fw-bold mb-1">Foto Laporan</div>
+                {(() => {
+                  const photo = selected.photoUrl || selected.photo || selected.imageUrl || selected.image;
+                  return photo ? (
+                    <img src={photo} alt="Foto Laporan" style={{ maxWidth: '100%', borderRadius: 8 }} />
+                  ) : (
+                    <div className="text-muted">Tidak ada foto</div>
+                  );
+                })()}
+              </div>
+            </div>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setSelected(null)}>Tutup</Button>
+        </Modal.Footer>
+      </Modal>
     </AdminLayout>
   );
 };

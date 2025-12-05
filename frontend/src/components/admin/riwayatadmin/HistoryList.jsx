@@ -46,6 +46,17 @@ const HistoryList = ({ items, onDetail }) => {
               {selected.description && (
                 <div className="mb-2"><strong>Deskripsi:</strong> {selected.description}</div>
               )}
+              <div className="mt-3">
+                <div className="fw-bold mb-1">Foto Laporan</div>
+                {(() => {
+                  const photo = selected.photoUrl || selected.photo || selected.imageUrl || selected.image;
+                  return photo ? (
+                    <img src={photo} alt="Foto Laporan" style={{ maxWidth: '100%', borderRadius: 8 }} />
+                  ) : (
+                    <div className="text-muted">Tidak ada foto</div>
+                  );
+                })()}
+              </div>
             </div>
           )}
         </Modal.Body>

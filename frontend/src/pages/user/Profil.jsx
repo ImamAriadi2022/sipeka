@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Button, Card, Form, InputGroup, Modal } from 'react-bootstrap';
-import { FiEdit } from 'react-icons/fi';
 
 const Profil = () => {
   const [user, setUser] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [editForm, setEditForm] = useState({ name: '', email: '', avatar: '' });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -12,9 +12,11 @@ const Profil = () => {
     const fetchUserProfile = async () => {
       setLoading(true);
       try {
-        // Implement API call
-        // const userData = await api.getUserProfile();
-        // setUser(userData);
+        const cu = JSON.parse(localStorage.getItem('currentUser') || 'null');
+        if (cu) {
+          setUser(cu);
+          setEditForm({ name: cu.fullName || cu.name || '', email: cu.email || '', avatar: cu.avatar || '' });
+        }
       } catch (error) {
         console.error('Error fetching user profile:', error);
       } finally {
@@ -24,10 +26,37 @@ const Profil = () => {
     fetchUserProfile();
   }, []);
 
-  const handleProfileUpdate = async (updatedData) => {
-    // TODO: Update user profile
-    console.log('Updating profile:', updatedData);
+  const handleProfileUpdate = async (e) => {
+    e.preventDefault();
+    const name = editForm.name.trim();
+    const email = editForm.email.trim();
+    if (!name || !email) return;
+
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const idx = users.findIndex(u => u.email === (user?.email || ''));
+    const updatedUser = {
+      ...(idx >= 0 ? users[idx] : user || {}),
+      fullName: name,
+      email,
+      avatar: editForm.avatar || (user?.avatar || ''),
+    };
+    if (idx >= 0) {
+      users[idx] = updatedUser;
+      localStorage.setItem('users', JSON.stringify(users));
+    }
+    localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+    setUser(updatedUser);
     setIsEditing(false);
+  };
+
+  const handleAvatarChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      setEditForm({ ...editForm, avatar: reader.result });
+    };
+    reader.readAsDataURL(file);
   };
 
   const [showPwdModal, setShowPwdModal] = useState(false);
@@ -95,27 +124,60 @@ const Profil = () => {
         <Card.Body style={{ background: '#f3f6fb', padding: 18 }}>
           <div className="d-flex flex-column align-items-center mb-3">
             <div style={{ width: 92, height: 92, borderRadius: '50%', overflow: 'hidden', background: '#fff', border: '2px solid #cfd6e6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              {/* avatar placeholder; replace with user photo if available */}
-              <img src="/img/avatar.png" alt="avatar" style={{ width: 80, height: 80, objectFit: 'cover' }} />
+              <img src={isEditing ? (editForm.avatar || '/img/avatar.png') : (user?.avatar || '/img/avatar.png')} alt="avatar" style={{ width: 80, height: 80, objectFit: 'cover' }} />
             </div>
             <div className="small text-muted mt-2 text-center">Informasi mengenai profil anda ada disini!</div>
           </div>
 
           <div className="mx-auto" style={{ maxWidth: '540px' }}>
-            <div className="fw-bold small mb-1">Nama Lengkap</div>
-            <InputGroup className="mb-3">
-              <Form.Control type="text" value={user?.name || 'Keysha'} readOnly />
-            </InputGroup>
+            {!isEditing ? (
+              <>
+                <div className="fw-bold small mb-1">Nama Lengkap</div>
+                <InputGroup className="mb-3">
+                  <Form.Control type="text" value={user?.fullName || user?.name || 'Keysha'} readOnly />
+                </InputGroup>
 
-            <div className="fw-bold small mb-1">Email</div>
-            <InputGroup className="mb-4">
-              <Form.Control type="email" value={user?.email || 'keysha@gmail.com'} readOnly />
-              <span className="input-group-text"><FiEdit /></span>
-            </InputGroup>
+                <div className="fw-bold small mb-1">Email</div>
+                <InputGroup className="mb-4">
+                  <Form.Control type="email" value={user?.email || 'keysha@gmail.com'} readOnly />
+                </InputGroup>
 
-            <div className="d-flex justify-content-center">
-              <Button variant="primary" onClick={openPwdModal}>Ubah Password</Button>
-            </div>
+                <div className="d-flex justify-content-center gap-2">
+                  <Button variant="primary" onClick={() => setIsEditing(true)}>Edit Profil</Button>
+                  <Button variant="secondary" onClick={openPwdModal}>Ubah Password</Button>
+                </div>
+              </>
+            ) : (
+              <Form onSubmit={handleProfileUpdate}>
+                <div className="fw-bold small mb-1">Foto Profil</div>
+                <InputGroup className="mb-3">
+                  <Form.Control type="file" accept="image/*" onChange={handleAvatarChange} />
+                </InputGroup>
+
+                <div className="fw-bold small mb-1">Nama Lengkap</div>
+                <InputGroup className="mb-3">
+                  <Form.Control
+                    type="text"
+                    value={editForm.name}
+                    onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                  />
+                </InputGroup>
+
+                <div className="fw-bold small mb-1">Email</div>
+                <InputGroup className="mb-4">
+                  <Form.Control
+                    type="email"
+                    value={editForm.email}
+                    onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                  />
+                </InputGroup>
+
+                <div className="d-flex justify-content-center gap-2">
+                  <Button variant="secondary" onClick={() => setIsEditing(false)}>Batal</Button>
+                  <Button variant="primary" type="submit">Simpan</Button>
+                </div>
+              </Form>
+            )}
           </div>
         </Card.Body>
       </Card>

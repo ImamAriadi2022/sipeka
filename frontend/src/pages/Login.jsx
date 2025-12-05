@@ -24,23 +24,27 @@ const Login = () => {
       }
 
       const users = JSON.parse(localStorage.getItem('users') || '[]');
-      const match = users.find(u => u.email === credentials.email && u.password === credentials.password);
+      const match = users.find(
+        (u) => u.email === credentials.email && u.password === credentials.password
+      );
 
       if (!match) {
         setToast({ show: true, message: 'Email atau password salah', bg: 'danger' });
         return;
       }
 
-      // Set auth token + role
       localStorage.setItem('authToken', 'static-demo-token');
       localStorage.setItem('userRole', match.role || 'user');
       localStorage.setItem('currentUser', JSON.stringify(match));
 
-      setToast({ show: true, message: `Login berhasil sebagai ${match.role === 'admin' ? 'Admin' : 'Mahasiswa'}`, bg: 'success' });
+      setToast({
+        show: true,
+        message: `Login berhasil sebagai ${match.role === 'admin' ? 'Admin' : 'Mahasiswa'}`,
+        bg: 'success',
+      });
 
-      // Navigate to role dashboard after short delay
       const target = match.role === 'admin' ? '/admin/dashboard' : '/dashboard';
-      await new Promise(r => setTimeout(r, 800));
+      await new Promise((r) => setTimeout(r, 800));
       window.history.pushState({}, '', target);
       window.location.reload();
     } catch (error) {
@@ -54,10 +58,9 @@ const Login = () => {
   const handleRegister = async (userData) => {
     setLoading(true);
     try {
-      // TODO: Implement register logic
+      // Dummy register handler (form tetap bisa loading)
       console.log('Register data:', userData);
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 2000));
     } catch (error) {
       console.error('Register error:', error);
     } finally {
@@ -65,62 +68,83 @@ const Login = () => {
     }
   };
 
-  const toggleMode = () => {
-    setIsRegisterMode(!isRegisterMode);
-  };
+  const toggleMode = () => setIsRegisterMode(!isRegisterMode);
 
   return (
-    <div
-      className="container d-flex justify-content-center align-items-center"
-      style={{ minHeight: '100vh', paddingTop: '64px' }}
-    >
-      <div className="w-100" style={{ maxWidth: 1000 }}>
-        <Card className="shadow-lg border-0 auth-card" 
-              style={{ 
-                borderRadius: '25px', 
-                overflow: 'hidden',
-                backgroundColor: '#EDF2D7'
-              }}>
+    <div style={{ minHeight: '100vh', backgroundColor: '#EDF2D7' }}>
+      <Card
+        className="border-0"
+        style={{
+          minHeight: '100vh',
+          borderRadius: 0,
+          backgroundColor: '#EDF2D7',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <div style={{ width: '100%', maxWidth: 690 }}>
           {!isRegisterMode ? (
             <Row className="g-0" key="login-layout">
-              <Col md={7} className="panel-animate-left" style={{ backgroundColor: '#EDF2D7' }}>
+              <Col
+                md={7}
+                className="panel-animate-left"
+                style={{ backgroundColor: '#EDF2D7' }}
+              >
                 <div className="p-4">
-                  <LoginForm 
-                    onSubmit={handleLogin} 
+                  <LoginForm
+                    onSubmit={handleLogin}
                     loading={loading}
-                    onToggleMode={() => setIsRegisterMode(true)}
+                    onToggleMode={toggleMode}
                   />
                 </div>
               </Col>
-              <Col md={5} className="d-flex align-items-center justify-content-center p-4 panel-animate-right" 
-                   style={{ backgroundColor: '#EDF2D7' }}>
+              <Col
+                md={5}
+                className="d-flex align-items-center justify-content-center p-4 panel-animate-right"
+                style={{ backgroundColor: '#EDF2D7' }}
+              >
                 <LoginHeader />
               </Col>
             </Row>
           ) : (
             <Row className="g-0" key="register-layout">
-              <Col md={6} className="d-flex align-items-center justify-content-center p-4 panel-animate-left" 
-                   style={{ backgroundColor: '#EDF2D7' }}>
+              <Col
+                md={6}
+                className="d-flex align-items-center justify-content-center p-4 panel-animate-left"
+                style={{ backgroundColor: '#EDF2D7' }}
+              >
                 <RegisterHeader />
               </Col>
-              <Col md={6} className="panel-animate-right" style={{ backgroundColor: '#EDF2D7' }}>
+              <Col
+                md={6}
+                className="panel-animate-right"
+                style={{ backgroundColor: '#EDF2D7' }}
+              >
                 <div className="p-4">
-                  <RegisterForm 
-                    onSubmit={handleRegister} 
+                  <RegisterForm
+                    onSubmit={handleRegister}
                     loading={loading}
-                    onToggleMode={() => setIsRegisterMode(false)}
+                    onToggleMode={toggleMode}
                   />
                 </div>
               </Col>
             </Row>
           )}
-        </Card>
-        <ToastContainer position="top-end" className="p-3">
-          <Toast bg={toast.bg} onClose={() => setToast({ ...toast, show: false })} show={toast.show} delay={1500} autohide>
-            <Toast.Body className="text-white">{toast.message}</Toast.Body>
-          </Toast>
-        </ToastContainer>
-      </div>
+  
+          <ToastContainer position="top-end" className="p-3">
+            <Toast
+              bg={toast.bg}
+              onClose={() => setToast({ ...toast, show: false })}
+              show={toast.show}
+              delay={1500}
+              autohide
+            >
+              <Toast.Body className="text-white">{toast.message}</Toast.Body>
+            </Toast>
+          </ToastContainer>
+        </div>
+      </Card>
     </div>
   );
 };
