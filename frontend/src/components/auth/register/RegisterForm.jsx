@@ -26,10 +26,16 @@ const RegisterForm = ({ onSubmit, loading, onToggleMode }) => {
     
     // Basic validation
     if (!formData.fullName || !formData.email || !formData.npm || !formData.password) {
-      setError('Please fill all fields');
+      setError('Semua field wajib diisi');
       return;
     }
     
+    if (formData.password.length < 6) {
+      setError('Password minimal 6 karakter');
+      return;
+    }
+    
+    // Pass formData to parent
     onSubmit(formData);
   };
 

@@ -6,6 +6,7 @@ const Profil = () => {
   const [user, setUser] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState({ name: '', email: '', avatar: '' });
+  const [avatarFile, setAvatarFile] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -52,13 +53,9 @@ const Profil = () => {
       formData.append('name', name);
       formData.append('email', email);
       
-      // Handle avatar upload if it's a file
-      if (editForm.avatar && editForm.avatar.startsWith('data:')) {
-        // Convert base64 to file if needed
-        const avatarInput = document.querySelector('input[type="file"]');
-        if (avatarInput?.files?.[0]) {
-          formData.append('avatar', avatarInput.files[0]);
-        }
+      // Handle avatar upload if file exists
+      if (avatarFile) {
+        formData.append('avatar', avatarFile);
       }
 
       const response = await authAPI.updateProfile(formData);
@@ -68,6 +65,7 @@ const Profil = () => {
         setUser(updatedUser);
         localStorage.setItem('currentUser', JSON.stringify(updatedUser));
         setIsEditing(false);
+        setAvatarFile(null);
         alert('Profil berhasil diperbarui');
       }
     } catch (error) {
@@ -79,6 +77,7 @@ const Profil = () => {
   const handleAvatarChange = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    setAvatarFile(file);
     const reader = new FileReader();
     reader.onload = () => {
       setEditForm({ ...editForm, avatar: reader.result });

@@ -11,6 +11,7 @@ const Register = () => {
   const handleRegister = async (userData) => {
     setLoading(true);
     try {
+      console.log('Register data being sent:', userData); // Debug
       const response = await authAPI.register(userData);
       
       if (response.data.success) {
@@ -31,6 +32,7 @@ const Register = () => {
       }
     } catch (error) {
       console.error('Register error:', error);
+      console.error('Error response:', error.response?.data); // Debug
       const message = error.response?.data?.message || error.response?.data?.errors?.email?.[0] || 'Terjadi kesalahan saat registrasi';
       setToast({ show: true, message, bg: 'danger' });
     } finally {

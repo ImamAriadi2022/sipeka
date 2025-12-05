@@ -40,13 +40,15 @@ api.interceptors.response.use(
 
 // Auth API
 export const authAPI = {
-  register: (data) => api.post('/auth/register', {
-    fullName: data.fullName,
-    name: data.name || data.fullName,
-    email: data.email,
-    npm: data.npm,
-    password: data.password,
-  }),
+  register: (data) => {
+    // Don't send nested object, send flat data
+    return api.post('/auth/register', {
+      fullName: data.fullName,
+      email: data.email,
+      npm: data.npm,
+      password: data.password,
+    });
+  },
   
   login: (email, password) => api.post('/auth/login', { email, password }),
   
