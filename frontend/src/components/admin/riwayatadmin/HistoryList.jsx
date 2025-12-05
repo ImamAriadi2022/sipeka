@@ -49,12 +49,21 @@ const HistoryList = ({ items, onDetail }) => {
               <div className="mt-3">
                 <div className="fw-bold mb-1">Foto Laporan</div>
                 {(() => {
-                  const photo = selected.photoUrl || selected.photo || selected.imageUrl || selected.image;
-                  return photo ? (
-                    <img src={photo} alt="Foto Laporan" style={{ maxWidth: '100%', borderRadius: 8 }} />
-                  ) : (
-                    <div className="text-muted">Tidak ada foto</div>
-                  );
+                  // Check photoUrl first (main photo)
+                  if (selected.photoUrl) {
+                    return <img src={selected.photoUrl} alt="Foto Laporan" style={{ maxWidth: '100%', borderRadius: 8 }} />;
+                  }
+                  // Check photos array
+                  if (selected.photos && selected.photos.length > 0) {
+                    return (
+                      <div className="d-flex flex-wrap gap-2">
+                        {selected.photos.map((photo, idx) => (
+                          <img key={idx} src={photo} alt={`Foto ${idx + 1}`} style={{ maxWidth: '100%', borderRadius: 8 }} />
+                        ))}
+                      </div>
+                    );
+                  }
+                  return <div className="text-muted">Tidak ada foto</div>;
                 })()}
               </div>
             </div>

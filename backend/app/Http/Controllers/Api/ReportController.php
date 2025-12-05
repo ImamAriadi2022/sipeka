@@ -51,7 +51,7 @@ class ReportController extends Controller
                     'category' => $report->category,
                     'status' => $report->status,
                     'date' => $report->date->format('Y-m-d'),
-                    'photos' => $report->photos ?? [],
+                    'photos' => array_map(fn($path) => asset('storage/' . $path), $report->photos ?? []),
                     'photoUrl' => $report->photo_url ? asset('storage/' . $report->photo_url) : null,
                     'photosCount' => count($report->photos ?? []),
                     'createdAt' => $report->created_at->toISOString(),

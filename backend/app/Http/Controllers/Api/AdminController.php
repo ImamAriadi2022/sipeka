@@ -82,9 +82,6 @@ class AdminController extends Controller
     {
         $query = Report::with('user');
 
-        // Exclude pending reports
-        $query->whereIn('status', ['Disetujui', 'Ditolak', 'Proses', 'Selesai']);
-
         // Filter by status if provided
         if ($request->has('status')) {
             $query->byStatus($request->status);

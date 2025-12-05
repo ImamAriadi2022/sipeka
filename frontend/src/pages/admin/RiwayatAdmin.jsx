@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import HistoryList from '../../components/admin/riwayatadmin/HistoryList';
 import AdminLayout from '../../layouts/AdminLayout';
+import { adminAPI } from '../../services/api';
 
 const HalamanRiwayatAdmin = () => {
   const [historyData, setHistoryData] = useState([]);
@@ -19,52 +20,55 @@ const HalamanRiwayatAdmin = () => {
   });
 
   useEffect(() => {
-    // Mock data for demonstration
-    const mockData = [
-      {
-        id: 1,
-        timestamp: '2024-12-03T10:30:00Z',
-        actionType: 'create',
-        actionName: 'Membuat Laporan',
-        description: 'Admin membuat laporan kerusakan fasilitas',
-        target: 'RPT-001',
-        admin: 'Admin 1',
-        adminRole: 'Administrator',
-        status: 'success'
-      },
-      {
-        id: 2,
-        timestamp: '2024-12-03T09:15:00Z',
-        actionType: 'update',
-        actionName: 'Update Status',
-        description: 'Mengubah status laporan menjadi dalam proses',
-        target: 'RPT-002',
-        admin: 'Admin 2',
-        adminRole: 'Moderator',
-        status: 'success'
-      }
-    ];
-    
-    setHistoryData(mockData);
+    loadReportHistory();
   }, [filters]);
+
+  const loadReportHistory = async () => {
+    setLoading(true);
+    try {
+      const params = {};
+      if (filters.status !== 'all') {
+        params.status = filters.status;
+      }
+      
+      const response = await adminAPI.getReportHistory(params);
+      if (response.data.success) {
+        // Transform API data to match component expectations
+        const transformed = response.data.reports.map(r => ({
+          id: r.id,
+          timestamp: r.updatedAt || r.createdAt,
+          actionType: 'report',
+          actionName: `Status: ${r.status}`,
+          description: r.description,
+          title: r.title,
+          location: r.location,
+          target: `RPT-${r.id}`,
+          admin: r.userName || 'Admin',
+          status: r.status,
+          photoUrl: r.photoUrl,
+          photos: r.photos,
+        }));
+        setHistoryData(transformed);
+      }
+    } catch (error) {
+      console.error('Load history error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleFilterChange = (newFilters) => {
     setFilters(newFilters);
-    // TODO: Fetch filtered data
   };
-
-  const reports = JSON.parse(localStorage.getItem('reports') || '[]');
-  const historyItems = reports.map((r, idx) => ({
-    id: r.id || idx + 1,
-    location: r.location,
-    title: r.title,
-    status: r.status === 'Menunggu' ? 'Proses' : r.status || 'Selesai',
-  }));
 
   return (
     <AdminLayout>
-      <h5 className="text-center fw-bold mb-3" style={{ color: '#333' }}>Laporan Masuk</h5>
-      <HistoryList items={historyItems} onDetail={(item) => console.log('Detil riwayat', item)} />
+      <h5 className="text-center fw-bold mb-3" style={{ color: '#333' }}>Riwayat Laporan Admin</h5>
+      {loading ? (
+        <div className="text-center">Loading...</div>
+      ) : (
+        <HistoryList items={historyData} onDetail={(item) => console.log('Detail riwayat', item)} />
+      )}
     </AdminLayout>
   );
 };

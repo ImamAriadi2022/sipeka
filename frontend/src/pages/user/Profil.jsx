@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Button, Card, Form, InputGroup, Modal } from 'react-bootstrap';
+import { authAPI } from '../../services/api';
 
 const Profil = () => {
   const [user, setUser] = useState(null);
@@ -8,17 +9,30 @@ const Profil = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // TODO: Fetch user profile data
+    // Fetch user profile data from API
     const fetchUserProfile = async () => {
       setLoading(true);
       try {
+        const response = await authAPI.getProfile();
+        if (response.data.success) {
+          const userData = response.data.user;
+          setUser(userData);
+          setEditForm({ 
+            name: userData.fullName || userData.name || '', 
+            email: userData.email || '', 
+            avatar: userData.avatar || '' 
+          });
+          // Update localStorage
+          localStorage.setItem('currentUser', JSON.stringify(userData));
+        }
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
+        // Fallback to localStorage if API fails
         const cu = JSON.parse(localStorage.getItem('currentUser') || 'null');
         if (cu) {
           setUser(cu);
           setEditForm({ name: cu.fullName || cu.name || '', email: cu.email || '', avatar: cu.avatar || '' });
         }
-      } catch (error) {
-        console.error('Error fetching user profile:', error);
       } finally {
         setLoading(false);
       }
@@ -32,21 +46,34 @@ const Profil = () => {
     const email = editForm.email.trim();
     if (!name || !email) return;
 
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    const idx = users.findIndex(u => u.email === (user?.email || ''));
-    const updatedUser = {
-      ...(idx >= 0 ? users[idx] : user || {}),
-      fullName: name,
-      email,
-      avatar: editForm.avatar || (user?.avatar || ''),
-    };
-    if (idx >= 0) {
-      users[idx] = updatedUser;
-      localStorage.setItem('users', JSON.stringify(users));
+    try {
+      const formData = new FormData();
+      formData.append('fullName', name);
+      formData.append('name', name);
+      formData.append('email', email);
+      
+      // Handle avatar upload if it's a file
+      if (editForm.avatar && editForm.avatar.startsWith('data:')) {
+        // Convert base64 to file if needed
+        const avatarInput = document.querySelector('input[type="file"]');
+        if (avatarInput?.files?.[0]) {
+          formData.append('avatar', avatarInput.files[0]);
+        }
+      }
+
+      const response = await authAPI.updateProfile(formData);
+      
+      if (response.data.success) {
+        const updatedUser = response.data.user;
+        setUser(updatedUser);
+        localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+        setIsEditing(false);
+        alert('Profil berhasil diperbarui');
+      }
+    } catch (error) {
+      console.error('Update profile error:', error);
+      alert(error.response?.data?.message || 'Gagal memperbarui profil');
     }
-    localStorage.setItem('currentUser', JSON.stringify(updatedUser));
-    setUser(updatedUser);
-    setIsEditing(false);
   };
 
   const handleAvatarChange = async (e) => {
@@ -76,21 +103,9 @@ const Profil = () => {
   const handlePasswordChange = async (e) => {
     e.preventDefault();
     setPwdError('');
-    const storedUsers = JSON.parse(localStorage.getItem('users') || '[]');
-    const email = user?.email || 'keysha@gmail.com';
-    const idx = storedUsers.findIndex(u => u.email === email);
-    const currentUser = idx >= 0 ? storedUsers[idx] : null;
 
-    if (!currentUser) {
-      setPwdError('Profil tidak ditemukan.');
-      return;
-    }
     if (!pwdForm.current || !pwdForm.next || !pwdForm.confirm) {
       setPwdError('Semua kolom wajib diisi.');
-      return;
-    }
-    if (currentUser.password && pwdForm.current !== currentUser.password) {
-      setPwdError('Password saat ini tidak sesuai.');
       return;
     }
     if (pwdForm.next.length < 6) {
@@ -102,15 +117,17 @@ const Profil = () => {
       return;
     }
 
-    storedUsers[idx] = { ...currentUser, password: pwdForm.next };
-    localStorage.setItem('users', JSON.stringify(storedUsers));
-    // Optionally update current user in storage
-    const cu = JSON.parse(localStorage.getItem('currentUser') || 'null');
-    if (cu && cu.email === email) {
-      localStorage.setItem('currentUser', JSON.stringify({ ...cu, password: pwdForm.next }));
+    try {
+      const response = await authAPI.changePassword(pwdForm.current, pwdForm.next);
+      
+      if (response.data.success) {
+        closePwdModal();
+        alert('Password berhasil diubah.');
+      }
+    } catch (error) {
+      console.error('Change password error:', error);
+      setPwdError(error.response?.data?.message || 'Gagal mengubah password');
     }
-    closePwdModal();
-    alert('Password berhasil diubah.');
   };
 
   if (loading) {

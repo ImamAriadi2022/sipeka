@@ -4,6 +4,7 @@ import Header from '../../components/user/buatlaporan/Header';
 import LocationPicker from '../../components/user/buatlaporan/LocationPicker';
 import PhotoUpload from '../../components/user/buatlaporan/PhotoUpload';
 import ReportForm from '../../components/user/buatlaporan/ReportForm';
+import { reportsAPI } from '../../services/api';
 
 const BuatLaporan = () => {
   const [reportData, setReportData] = useState({
@@ -27,30 +28,43 @@ const BuatLaporan = () => {
       return;
     }
 
-    const email = JSON.parse(localStorage.getItem('currentUser') || 'null')?.email || 'keysha@gmail.com';
-    const existing = JSON.parse(localStorage.getItem('reports') || '[]');
-    const newReport = {
-      id: Date.now(),
-      userEmail: email,
-      location: data.location,
-      title: data.title,
-      date: data.date,
-      description: data.description || '',
-      status: 'Menunggu',
-      photosCount: Array.isArray(data.photos) ? data.photos.length : 0,
-    };
-    localStorage.setItem('reports', JSON.stringify([newReport, ...existing]));
-    setShowSuccess(true);
-    // Optional: reset form fields after success
-    setReportData({
-      title: '',
-      description: '',
-      location: null,
-      photos: [],
-      category: '',
-      priority: 'medium',
-      date: ''
-    });
+    try {
+      // Create FormData for file upload
+      const formData = new FormData();
+      formData.append('title', data.title);
+      formData.append('description', data.description || '');
+      formData.append('location', data.location);
+      formData.append('category', data.category || 'Lainnya');
+      formData.append('date', data.date);
+      
+      // Add photos if any
+      if (Array.isArray(data.photos) && data.photos.length > 0) {
+        data.photos.forEach((photo, index) => {
+          if (photo instanceof File) {
+            formData.append('photos[]', photo);
+          }
+        });
+      }
+
+      const response = await reportsAPI.create(formData);
+      
+      if (response.data.success) {
+        setShowSuccess(true);
+        // Reset form fields after success
+        setReportData({
+          title: '',
+          description: '',
+          location: null,
+          photos: [],
+          category: '',
+          priority: 'medium',
+          date: ''
+        });
+      }
+    } catch (error) {
+      console.error('Submit report error:', error);
+      setErrorMsg(error.response?.data?.message || 'Terjadi kesalahan saat membuat laporan');
+    }
   };
 
   return (

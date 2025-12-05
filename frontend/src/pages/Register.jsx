@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Card, Col, Row, Toast, ToastContainer } from 'react-bootstrap';
 import RegisterForm from '../components/auth/register/RegisterForm';
 import RegisterHeader from '../components/auth/register/RegisterHeader';
+import { authAPI } from '../services/api';
 
 const Register = () => {
   const [loading, setLoading] = useState(false);
@@ -10,31 +11,28 @@ const Register = () => {
   const handleRegister = async (userData) => {
     setLoading(true);
     try {
-      // Static register: save to localStorage users list
-      const users = JSON.parse(localStorage.getItem('users') || '[]');
-      const exists = users.find(u => u.email === userData.email);
-      if (exists) {
-        setToast({ show: true, message: 'Email sudah terdaftar', bg: 'danger' });
-        return;
+      const response = await authAPI.register(userData);
+      
+      if (response.data.success) {
+        setToast({ 
+          show: true, 
+          message: 'Registrasi berhasil! Mengalihkan ke dashboard...', 
+          bg: 'success' 
+        });
+        
+        const { token, user } = response.data;
+        localStorage.setItem('authToken', token);
+        localStorage.setItem('userRole', user.role);
+        localStorage.setItem('currentUser', JSON.stringify(user));
+        
+        await new Promise(r => setTimeout(r, 1000));
+        window.history.pushState({}, '', '/dashboard');
+        window.location.reload();
       }
-
-      const newUser = {
-        fullName: userData.fullName,
-        email: userData.email,
-        npm: userData.npm,
-        password: userData.password,
-        role: 'user' // force mahasiswa role on register
-      };
-      users.push(newUser);
-      localStorage.setItem('users', JSON.stringify(users));
-
-      setToast({ show: true, message: 'Registrasi berhasil! Silakan login.', bg: 'success' });
-      await new Promise(r => setTimeout(r, 1000));
-      window.history.pushState({}, '', '/login');
-      window.location.reload();
     } catch (error) {
       console.error('Register error:', error);
-      setToast({ show: true, message: 'Terjadi kesalahan saat registrasi', bg: 'danger' });
+      const message = error.response?.data?.message || error.response?.data?.errors?.email?.[0] || 'Terjadi kesalahan saat registrasi';
+      setToast({ show: true, message, bg: 'danger' });
     } finally {
       setLoading(false);
     }

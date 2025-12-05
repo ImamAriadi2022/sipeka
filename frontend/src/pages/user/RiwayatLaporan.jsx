@@ -1,15 +1,35 @@
 import { useEffect, useState } from 'react';
 import { Badge, Button, Card, ListGroup, Modal } from 'react-bootstrap';
 import { FiCalendar, FiMapPin, FiTag } from 'react-icons/fi';
+import { reportsAPI } from '../../services/api';
 
 const RiwayatLaporan = () => {
   const [reports, setReports] = useState([]);
   const [selected, setSelected] = useState(null);
 
   useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem('reports') || '[]');
-    setReports(stored);
+    loadUserReports();
   }, []);
+
+  const loadUserReports = async () => {
+    try {
+      const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+      const params = {};
+      if (currentUser.id) {
+        params.user_id = currentUser.id;
+      }
+      
+      const response = await reportsAPI.getAll(params);
+      if (response.data.success) {
+        setReports(response.data.reports);
+      }
+    } catch (error) {
+      console.error('Load reports error:', error);
+      // Fallback to localStorage if API fails
+      const stored = JSON.parse(localStorage.getItem('reports') || '[]');
+      setReports(stored);
+    }
+  };
 
   const statusVariant = (s) => {
     if (s === 'Ditolak') return 'danger';
@@ -66,11 +86,23 @@ const RiwayatLaporan = () => {
               )}
               <div className="mt-3">
                 <div className="fw-bold mb-1">Foto</div>
-                {selected.photoUrl ? (
-                  <img src={selected.photoUrl} alt="Foto Laporan" style={{ maxWidth: '100%', borderRadius: 8 }} />
-                ) : (
-                  <div className="text-muted">Tidak ada foto</div>
-                )}
+                {(() => {
+                  // Check photoUrl first (main photo)
+                  if (selected.photoUrl) {
+                    return <img src={selected.photoUrl} alt="Foto Laporan" style={{ maxWidth: '100%', borderRadius: 8 }} />;
+                  }
+                  // Check photos array
+                  if (selected.photos && selected.photos.length > 0) {
+                    return (
+                      <div className="d-flex flex-wrap gap-2">
+                        {selected.photos.map((photo, idx) => (
+                          <img key={idx} src={photo} alt={`Foto ${idx + 1}`} style={{ maxWidth: '100%', borderRadius: 8 }} />
+                        ))}
+                      </div>
+                    );
+                  }
+                  return <div className="text-muted">Tidak ada foto</div>;
+                })()}
               </div>
             </div>
           )}

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Badge, Card } from 'react-bootstrap';
+import { reportsAPI } from '../../services/api';
 
 const Dashboard = () => {
   const [summary, setSummary] = useState({
@@ -10,9 +11,31 @@ const Dashboard = () => {
   });
 
   useEffect(() => {
-    // TODO: Fetch real summary from API later
-    // setSummary(...)
+    loadUserStats();
   }, []);
+
+  const loadUserStats = async () => {
+    try {
+      const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+      const params = {};
+      if (currentUser.id) {
+        params.user_id = currentUser.id;
+      }
+      
+      const response = await reportsAPI.getAll(params);
+      if (response.data.success) {
+        const reports = response.data.reports;
+        setSummary({
+          menunggu: reports.filter(r => r.status === 'Menunggu').length,
+          diterima: reports.filter(r => r.status === 'Disetujui').length,
+          proses: reports.filter(r => r.status === 'Proses').length,
+          selesai: reports.filter(r => r.status === 'Selesai').length,
+        });
+      }
+    } catch (error) {
+      console.error('Load stats error:', error);
+    }
+  };
 
   const goToCreate = () => {
     window.history.pushState({}, '', '/buat-laporan');
