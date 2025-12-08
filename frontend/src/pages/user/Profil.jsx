@@ -45,7 +45,10 @@ const Profil = () => {
     e.preventDefault();
     const name = editForm.name.trim();
     const email = editForm.email.trim();
-    if (!name || !email) return;
+    if (!name || !email) {
+      alert('Nama dan email wajib diisi');
+      return;
+    }
 
     try {
       const formData = new FormData();
@@ -58,11 +61,20 @@ const Profil = () => {
         formData.append('avatar', avatarFile);
       }
 
+      console.log('Updating profile with:', { name, email, hasAvatar: !!avatarFile }); // Debug
+
       const response = await authAPI.updateProfile(formData);
+      
+      console.log('Update profile response:', response.data); // Debug
       
       if (response.data.success) {
         const updatedUser = response.data.user;
         setUser(updatedUser);
+        setEditForm({ 
+          name: updatedUser.fullName || updatedUser.name || '', 
+          email: updatedUser.email || '', 
+          avatar: updatedUser.avatar || '' 
+        });
         localStorage.setItem('currentUser', JSON.stringify(updatedUser));
         setIsEditing(false);
         setAvatarFile(null);
@@ -70,7 +82,13 @@ const Profil = () => {
       }
     } catch (error) {
       console.error('Update profile error:', error);
-      alert(error.response?.data?.message || 'Gagal memperbarui profil');
+      console.error('Error response:', error.response?.data); // Debug
+      
+      const errorMsg = error.response?.data?.message 
+        || error.response?.data?.errors?.email?.[0]
+        || error.response?.data?.errors?.fullName?.[0]
+        || 'Gagal memperbarui profil';
+      alert(errorMsg);
     }
   };
 
